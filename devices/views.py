@@ -92,7 +92,7 @@ ds_id=graphdata.device_id
 class YearlyViewset(viewsets.ModelViewSet):
 	# define queryset
     global servi,ds_id
-    queryset = repo_yearly.objects.filter(service=servi,device_id=ds_id)
+    queryset = cnd_tds_repo_yearly.objects.filter(service=servi,device_id=ds_id)
     # graphdata = graph_info.objects.last()
     # print("graph data is:",graphdata.service_name,graphdata.device_id)
     
@@ -116,21 +116,21 @@ class keyViewset(viewsets.ModelViewSet):
         
 class HourlyViewset(viewsets.ModelViewSet):
 	# define queryset
-	queryset = repo_hourly.objects.all()
+	queryset = cnd_tds_repo_hourly.objects.all()
 
 	# specify serializer to be used
 	serializer_class = HourlySerializer
         
 class MonthlyViewset(viewsets.ModelViewSet):
 	# define queryset
-	queryset = repo_monthly.objects.all()
+	queryset = cnd_tds_repo_monthly.objects.all()
 
 	# specify serializer to be used
 	serializer_class = MonthlySerializer
         
 class DailyViewset(viewsets.ModelViewSet):
 	# define queryset
-	queryset = repo_daily.objects.all()
+	queryset = cnd_tds_repo_daily.objects.all()
 
 	# specify serializer to be used
 	serializer_class = DailySerializer
@@ -540,7 +540,7 @@ def testo(request):
              print(device_idlist)
         print("component is:",components)
         service_list=[]
-        repoyearly=repo_yearly.objects.all()
+        repoyearly=cnd_tds_repo_yearly.objects.all()
         for ry in repoyearly:
                 ser=ry.service
                 service_list.append(ser)
@@ -589,99 +589,288 @@ def testo(request):
                 print(dd[0])
                 ds=treat_cnd_tds_sen.objects.create(device_id=device_id,message_type=msg_type,cnd=cnd,spn=spn,tsp=tsp,asp=asp,year=dd[0],month=dd[1],day=dd[2],hour=dd[3],minit=dd[4],second=dd[5])
                 ds.save()
-               
-                yrdata=treat_cnd_tds_sen.objects.filter(year=dd[0],device_id=device_id)
-                count=0
-                sums=0
-                avgs = 0
-                if yrdata:
-                    for yr in yrdata:
-                        yr_d_id=yr.device_id
-                        if yr_d_id == device_id:
-                            cnds=yr.cnd
-                            print("cnds is:",cnds)
-                            sums=sums+cnds
-                            count=count+1
-                            print("sums is:",sums)
-                            print("count is:",count)
-                    avgs=sums/count
-                hr=repo_yearly.objects.filter(year=dd[0],device_id=device_id)
-                if hr:
-                    yr_data=repo_yearly.objects.filter(device_id=device_id).update(device_id=device_id,service='cnd_tds_cnd',sum=sums,count=count,avg=avgs,month=dd[1],year=dd[0])
-                else:
-                    yr_data=repo_yearly.objects.create(device_id=device_id,service='cnd_tds_cnd',sum=sums,count=count,avg=avgs,month=dd[1],year=dd[0])
-                    yr_data.save()
-                               
-                #month
-                yrdata=treat_cnd_tds_sen.objects.filter(year=dd[0],month=dd[1],device_id=device_id)
-                count=0
-                sums=0
-                avgs = 0
-                if yrdata:
-                    for yr in yrdata:
-                        yr_d_id=yr.device_id
-                        if yr_d_id == device_id:
-                            cnds=yr.cnd
-                            print("cnds is:",cnds)
-                            sums=sums+cnds
-                            count=count+1
-                            print("sums is:",sums)
-                            print("count is:",count)
-                    avgs=sums/count
-                hr=repo_monthly.objects.filter(year=dd[0],month=dd[1],device_id=device_id)
-                if hr:
-                    yr_data=repo_monthly.objects.filter(year=dd[0],month=dd[1],device_id=device_id).update(device_id=device_id,service='cnd_tds_cnd',sum=sums,count=count,avg=avgs,month=dd[1],year=dd[0])
-                else:
-                    yr_data=repo_monthly.objects.create(device_id=device_id,service='cnd_tds_cnd',sum=sums,count=count,avg=avgs,month=dd[1],year=dd[0])
-                    yr_data.save()
-                
-                
-                # day
-                yrdata=treat_cnd_tds_sen.objects.filter(year=dd[0],month=dd[1],day=dd[2],device_id=device_id)
-                count=0
-                sums=0
-                avgs = 0
-                if yrdata:
-                    for yr in yrdata:
-                        yr_d_id=yr.device_id
-                        if yr_d_id == device_id:
-                            cnds=yr.cnd
-                            print("cnds is:",cnds)
-                            sums=sums+cnds
-                            count=count+1
-                            print("sums is:",sums)
-                            print("count is:",count)
-                    avgs=sums/count
-                hr=repo_daily.objects.filter(year=dd[0],month=dd[1],day=dd[2],device_id=device_id)
-                if hr:
-                    yr_data=repo_daily.objects.filter(year=dd[0],month=dd[1],day=dd[2],device_id=device_id).update(device_id=device_id,service='cnd_tds_cnd',sum=sums,count=count,avg=avgs,month=dd[1],year=dd[0],day=dd[2])
-                else:
-                    yr_data=repo_daily.objects.create(device_id=device_id,service='cnd_tds_cnd',sum=sums,count=count,avg=avgs,month=dd[1],year=dd[0],day=dd[2])
-                    yr_data.save()
-                
-                
                 # Hour
                 yrdata=treat_cnd_tds_sen.objects.filter(year=dd[0],month=dd[1],day=dd[2],hour=dd[3],device_id=device_id)
                 count=0
-                sums=0
-                avgs = 0
+                sumd={}
+                sums_cnd=0
+                sums_spn=0
+                sums_tsp=0
+                sums_asp=0
+                avgs_cnd = 0
+                avgs_spn = 0
+                avgs_tsp = 0
+                avgs_asp = 0
                 if yrdata:
                     for yr in yrdata:
                         yr_d_id=yr.device_id
                         if yr_d_id == device_id:
                             cnds=yr.cnd
+                            spns=yr.spn
+                            tsps=yr.tsp
+                            asps=yr.asp
                             print("cnds is:",cnds)
-                            sums=sums+cnds
+                            sums_cnd=sums_cnd+cnds
+                            sums_spn=sums_spn+spns
+                            sums_tsp=sums_tsp+tsps
+                            sums_asp=sums_asp+asps
                             count=count+1
-                            print("sums is:",sums)
+                            print("sums is:",sums_cnd)
                             print("count is:",count)
-                    avgs=sums/count
-                hr=repo_hourly.objects.filter(year=dd[0],month=dd[1],day=dd[2],hour=dd[3],device_id=device_id)
+                    avgs_cnd=sums_cnd/count
+                    avgs_spn=sums_spn/count
+                    avgs_tsp=sums_tsp/count
+                    avgs_asp=sums_asp/count
+                    print("@@@")
+                hr=cnd_tds_repo_hourly.objects.filter(year=dd[0],month=dd[1],day=dd[2],hour=dd[3],device_id=device_id)
                 if hr:
-                    yr_data=repo_hourly.objects.filter(year=dd[0],month=dd[1],day=dd[2],hour=dd[3],device_id=device_id).update(device_id=device_id,service='cnd_tds_cnd',sum=sums,count=count,avg=avgs,hour=dd[3],month=dd[1],year=dd[0],day=dd[2])
+                    print("$$$")
+                    yr_data=cnd_tds_repo_hourly.objects.filter(year=dd[0],month=dd[1],day=dd[2],hour=dd[3],device_id=device_id).update(device_id=device_id,service='cnd_tds_cnd',cnd={'sum_cnd':sums_cnd,'avg_cnd':avgs_cnd,'count':count},spn={'sum_spn':sums_spn,'avg_spn':avgs_spn,'count':count},tsp={'sum_tsp':sums_tsp,'avg_tsp':avgs_tsp,'count':count},asp={'sum_asp':sums_asp,'avg_asp':avgs_asp,'count':count},hour=dd[3],month=dd[1],year=dd[0],day=dd[2])
                 else:
-                    yr_data=repo_hourly.objects.create(device_id=device_id,service='cnd_tds_cnd',sum=sums,count=count,avg=avgs,hour=dd[3],month=dd[1],year=dd[0],day=dd[2])
+                    print("**@")
+                    yr_data=cnd_tds_repo_hourly.objects.create(device_id=device_id,service='cnd_tds_cnd',cnd={'sum_cnd':sums_cnd,'avg_cnd':avgs_cnd,'count':count},spn={'sum_spn':sums_spn,'avg_spn':avgs_spn,'count':count},tsp={'sum_tsp':sums_tsp,'avg_tsp':avgs_tsp,'count':count},asp={'sum_asp':sums_asp,'avg_asp':avgs_asp,'count':count},hour=dd[3],month=dd[1],year=dd[0],day=dd[2])
                     yr_data.save()
+                    print("@#$")
+                print("&&&&&")
+                #day   
+                yrdata=cnd_tds_repo_hourly.objects.filter(year=dd[0],month=dd[1],day=dd[2],device_id=device_id)
+                count=0
+                count_sum=0
+                count_cnd=0
+                count_spn=0
+                count_tsp=0
+                count_asp=0
+                sums_cnd=0
+                sums_spn=0
+                sums_tsp=0
+                sums_asp=0
+                avgs_cnd = 0
+                avgs_spn = 0
+                avgs_tsp = 0
+                avgs_asp = 0
+                if yrdata:
+                    for yr in yrdata:
+                        print("day for loop")
+                        yr_d_id=yr.device_id
+                        if yr_d_id == device_id:
+                            print("in if")
+                            cnds_d=yr.cnd
+                            spns_d=yr.spn
+                            tsps_d=yr.tsp
+                            asps_d=yr.asp
+                            sums_d=list(cnds_d.values())[0]
+                            sums_s=list(spns_d.values())[0]
+                            sums_t=list(tsps_d.values())[0]
+                            sums_a=list(asps_d.values())[0]
+                            # avgs_cnd=list(cnds.values())[1]
+                            count_cnd=list(cnds_d.values())[2]
+                            # for k,v in cnds.items():
+                            sums_cnd=sums_cnd+sums_d
+                            sums_spn=sums_spn+sums_s
+                            sums_tsp=sums_tsp+sums_t
+                            sums_asp=sums_asp+sums_a
+                            count_sum=count_sum+count_cnd
+
+
+                            print("sum from dict:",sums_cnd,type(sums_cnd))
+                            # spns=yr.spn[1]
+                            # tsps=yr.tsp[2]
+                            # asps=yr.asp[3]
+                            print("cnds is:",cnds)
+                            # sums_cnd=sums_cnd+cnds
+                            # sums_spn=sums_spn+spns
+                            # sums_tsp=sums_tsp+tsps
+                            # sums_asp=sums_asp+asps
+                            count=count+1
+                            print("count is:",count)
+                    print("sums is:",sums_cnd)
+                    print("countsum is:",count_sum)
+                    avgs_cnd=sums_cnd/count_sum
+                    print("average cnd is:",avgs_cnd)
+
+                    avgs_spn=sums_spn/count_sum
+                    print("avg of spn:",avgs_spn)
+                    avgs_tsp=sums_tsp/count_sum
+                    avgs_asp=sums_asp/count_sum
+                hr=cnd_tds_repo_daily.objects.filter(year=dd[0],month=dd[1],day=dd[2],device_id=device_id)
+                if hr:
+                    print("in if hr")
+                    yr_data=cnd_tds_repo_daily.objects.filter(year=dd[0],month=dd[1],day=dd[2],device_id=device_id).update(device_id=device_id,service='cnd_tds_cnd',cnd={'sum_cnd':sums_cnd,'avg_cnd':avgs_cnd,'count':count},spn={'sum_spn':sums_spn,'avg_spn':avgs_spn,'count':count},tsp={'sum_tsp':sums_tsp,'avg_tsp':avgs_tsp,'count':count},asp={'sum_asp':sums_asp,'avg_asp':avgs_asp,'count':count},month=dd[1],year=dd[0],day=dd[2],hour=dd[3])
+                    print("data insertedd")
+                else:
+                    yr_data=cnd_tds_repo_daily.objects.create(device_id=device_id,service='cnd_tds_cnd',cnd={'sum_cnd':sums_cnd,'avg_cnd':avgs_cnd,'count':count},spn={'sum_spn':sums_spn,'avg_spn':avgs_spn,'count':count},tsp={'sum_tsp':sums_tsp,'avg_tsp':avgs_tsp,'count':count},asp={'sum_asp':sums_asp,'avg_asp':avgs_asp,'count':count},month=dd[1],year=dd[0],day=dd[2],hour=dd[3])
+                    yr_data.save()
+                    print("success")
+                 #month
+                print("in month")
+                yrdata=cnd_tds_repo_daily.objects.filter(year=dd[0],month=dd[1],device_id=device_id)
+                count=0
+                sums_cnd=0
+                sums_spn=0
+                sums_tsp=0
+                sums_asp=0
+                avgs_cnd = 0
+                avgs_spn = 0
+                avgs_tsp = 0
+                avgs_asp = 0
+                if yrdata:
+                    for yr in yrdata:
+                        yr_d_id=yr.device_id
+                        if yr_d_id == device_id:
+                            cnds_m=yr.cnd
+                            spns_m=yr.spn
+                            tsps_m=yr.tsp
+                            asps_m=yr.asp
+                            sums_d=list(cnds_m.values())[0]
+                            sums_s=list(spns_m.values())[0]
+                            sums_t=list(tsps_m.values())[0]
+                            sums_a=list(asps_m.values())[0]
+                            # avgs_cnd=list(cnds.values())[1]
+                            count_cnd=list(cnds_d.values())[2]
+                            # for k,v in cnds.items():
+                            sums_cnd=sums_cnd+sums_d
+                            sums_spn=sums_spn+sums_s
+                            sums_tsp=sums_tsp+sums_t
+                            sums_asp=sums_asp+sums_a
+                            count_sum=count_sum+count_cnd
+
+
+                            print("sum from dict:",sums_cnd,type(sums_cnd))
+                            # spns=yr.spn[1]
+                            # tsps=yr.tsp[2]
+                            # asps=yr.asp[3]
+                            print("cnds is:",cnds)
+                            # sums_cnd=sums_cnd+cnds
+                            # sums_spn=sums_spn+spns
+                            # sums_tsp=sums_tsp+tsps
+                            # sums_asp=sums_asp+asps
+                            count=count+1
+                            print("count is:",count)
+                    print("sums is:",sums_cnd)
+                    print("countsum is:",count_sum)
+                    avgs_cnd=sums_cnd/count_sum
+                    print("average cnd is:",avgs_cnd)
+
+                    avgs_spn=sums_spn/count_sum
+                    print("avg of spn:",avgs_spn)
+                    avgs_tsp=sums_tsp/count_sum
+                    avgs_asp=sums_asp/count_sum
+                hr=cnd_tds_repo_monthly.objects.filter(year=dd[0],month=dd[1],device_id=device_id)
+                if hr:
+                    yr_data=cnd_tds_repo_monthly.objects.filter(year=dd[0],month=dd[1],device_id=device_id).update(device_id=device_id,service='cnd_tds_cnd',cnd={'sum_cnd':sums_cnd,'avg_cnd':avgs_cnd,'count':count},spn={'sum_spn':sums_spn,'avg_spn':avgs_spn,'count':count},tsp={'sum_tsp':sums_tsp,'avg_tsp':avgs_tsp,'count':count},asp={'sum_asp':sums_asp,'avg_asp':avgs_asp,'count':count},month=dd[1],year=dd[0],day=dd[2],hour=dd[3])
+                else:
+                    yr_data=cnd_tds_repo_monthly.objects.create(device_id=device_id,service='cnd_tds_cnd',cnd={'sum_cnd':sums_cnd,'avg_cnd':avgs_cnd,'count':count},spn={'sum_spn':sums_spn,'avg_spn':avgs_spn,'count':count},tsp={'sum_tsp':sums_tsp,'avg_tsp':avgs_tsp,'count':count},asp={'sum_asp':sums_asp,'avg_asp':avgs_asp,'count':count},month=dd[1],year=dd[0],day=dd[2],hour=dd[3])
+                    yr_data.save()
+               
+                # year
+                yrdata=cnd_tds_repo_monthly.objects.filter(year=dd[0],device_id=device_id)
+                count=0
+                sums_cnd=0
+                sums_spn=0
+                sums_tsp=0
+                sums_asp=0
+                avgs_cnd = 0
+                avgs_spn = 0
+                avgs_tsp = 0
+                avgs_asp = 0
+                if yrdata:
+                    for yr in yrdata:
+                        yr_d_id=yr.device_id
+                        if yr_d_id == device_id:
+                            cnds_m=yr.cnd
+                            spns_m=yr.spn
+                            tsps_m=yr.tsp
+                            asps_m=yr.asp
+                            sums_d=list(cnds_m.values())[0]
+                            sums_s=list(spns_m.values())[0]
+                            sums_t=list(tsps_m.values())[0]
+                            sums_a=list(asps_m.values())[0]
+                            # avgs_cnd=list(cnds.values())[1]
+                            count_cnd=list(cnds_d.values())[2]
+                            # for k,v in cnds.items():
+                            sums_cnd=sums_cnd+sums_d
+                            sums_spn=sums_spn+sums_s
+                            sums_tsp=sums_tsp+sums_t
+                            sums_asp=sums_asp+sums_a
+                            count_sum=count_sum+count_cnd
+
+
+                            print("sum from dict:",sums_cnd,type(sums_cnd))
+                            # spns=yr.spn[1]
+                            # tsps=yr.tsp[2]
+                            # asps=yr.asp[3]
+                            print("cnds is:",cnds)
+                            # sums_cnd=sums_cnd+cnds
+                            # sums_spn=sums_spn+spns
+                            # sums_tsp=sums_tsp+tsps
+                            # sums_asp=sums_asp+asps
+                            count=count+1
+                            print("count is:",count)
+                    print("sums is:",sums_cnd)
+                    print("countsum is:",count_sum)
+                    avgs_cnd=sums_cnd/count_sum
+                    print("average cnd is:",avgs_cnd)
+
+                    avgs_spn=sums_spn/count_sum
+                    print("avg of spn:",avgs_spn)
+                    avgs_tsp=sums_tsp/count_sum
+                    avgs_asp=sums_asp/count_sum
+                hr=cnd_tds_repo_yearly.objects.filter(year=dd[0],device_id=device_id)
+                if hr:
+                    yr_data=cnd_tds_repo_yearly.objects.filter(device_id=device_id).update(device_id=device_id,service='cnd_tds_cnd',cnd={'sum_cnd':sums_cnd,'avg_cnd':avgs_cnd,'count':count},spn={'sum_spn':sums_spn,'avg_spn':avgs_spn,'count':count},tsp={'sum_tsp':sums_tsp,'avg_tsp':avgs_tsp,'count':count},asp={'sum_asp':sums_asp,'avg_asp':avgs_asp,'count':count},month=dd[1],year=dd[0],day=dd[2],hour=dd[3])
+                else:
+                    yr_data=cnd_tds_repo_yearly.objects.create(device_id=device_id,service='cnd_tds_cnd',cnd={'sum_cnd':sums_cnd,'avg_cnd':avgs_cnd,'count':count},spn={'sum_spn':sums_spn,'avg_spn':avgs_spn,'count':count},tsp={'sum_tsp':sums_tsp,'avg_tsp':avgs_tsp,'count':count},asp={'sum_asp':sums_asp,'avg_asp':avgs_asp,'count':count},month=dd[1],year=dd[0],day=dd[2],hour=dd[3])
+                    yr_data.save()
+                               
+                # #month
+                # yrdata=treat_cnd_tds_sen.objects.filter(year=dd[0],month=dd[1],device_id=device_id)
+                # count=0
+                # sums=0
+                # avgs = 0
+                # if yrdata:
+                #     for yr in yrdata:
+                #         yr_d_id=yr.device_id
+                #         if yr_d_id == device_id:
+                #             cnds=yr.cnd
+                #             print("cnds is:",cnds)
+                #             sums=sums+cnds
+                #             count=count+1
+                #             print("sums is:",sums)
+                #             print("count is:",count)
+                #     avgs=sums/count
+                # hr=repo_monthly.objects.filter(year=dd[0],month=dd[1],device_id=device_id)
+                # if hr:
+                #     yr_data=repo_monthly.objects.filter(year=dd[0],month=dd[1],device_id=device_id).update(device_id=device_id,service='cnd_tds_cnd',sum=sums,count=count,avg=avgs,month=dd[1],year=dd[0])
+                # else:
+                #     yr_data=repo_monthly.objects.create(device_id=device_id,service='cnd_tds_cnd',sum=sums,count=count,avg=avgs,month=dd[1],year=dd[0])
+                #     yr_data.save()
+                
+                
+                # day
+                # yrdata=treat_cnd_tds_sen.objects.filter(year=dd[0],month=dd[1],day=dd[2],device_id=device_id)
+                # count=0
+                # sums=0
+                # avgs = 0
+                # if yrdata:
+                #     for yr in yrdata:
+                #         yr_d_id=yr.device_id
+                #         if yr_d_id == device_id:
+                #             cnds=yr.cnd
+                #             print("cnds is:",cnds)
+                #             sums=sums+cnds
+                #             count=count+1
+                #             print("sums is:",sums)
+                #             print("count is:",count)
+                #     avgs=sums/count
+                # hr=repo_daily.objects.filter(year=dd[0],month=dd[1],day=dd[2],device_id=device_id)
+                # if hr:
+                #     yr_data=repo_daily.objects.filter(year=dd[0],month=dd[1],day=dd[2],device_id=device_id).update(device_id=device_id,service='cnd_tds_cnd',sum=sums,count=count,avg=avgs,month=dd[1],year=dd[0],day=dd[2])
+                # else:
+                #     yr_data=repo_daily.objects.create(device_id=device_id,service='cnd_tds_cnd',sum=sums,count=count,avg=avgs,month=dd[1],year=dd[0],day=dd[2])
+                #     yr_data.save()
+                
+                
+                
         except Exception as e:
             print("error ==>", e)
             msgo=e
@@ -716,99 +905,329 @@ def testo(request):
                 # repo_latestobj=repo_latestdata.objects.filter(device_id=device_id).update(device_id=device_id,message_type=msg_type,rwp=mydata1)
                 ds=treat_rwp.objects.create(device_id=device_id,message_type=msg_type,sts=sts,crt=crt,olc=olc,drc=drc,spn=spn,year=dd[0],month=dd[1],day=dd[2],hour=dd[3],minit=dd[4],second=dd[5])
                 ds.save()
-             
-                yrdata=treat_rwp.objects.filter(year=dd[0],device_id=device_id)
-                count=0
-                sums=0
-                avgs = 0
-                if yrdata:
-                    for yr in yrdata:
-                        yr_d_id=yr.device_id
-                        if yr_d_id == device_id:
-                            crt=yr.crt
-                            print("crt is:",crt)
-                            sums=sums+crt
-                            count=count+1
-                            print("sums is:",sums)
-                            print("count is:",count)
-                    avgs=sums/count
-                    print('avg is:',avgs)
-                hr=repo_yearly.objects.filter(year=dd[0],device_id=device_id)
-                if hr:
-                    yr_data=repo_yearly.objects.filter(device_id=device_id).update(device_id=device_id,service='rwp_crt',sum=sums,count=count,avg=avgs,month=dd[1],year=dd[0])
-                else:
-                    yr_data=repo_yearly.objects.create(device_id=device_id,service='rwp_crt',sum=sums,count=count,avg=avgs,month=dd[1],year=dd[0])
-                    yr_data.save()
-                
-                # month
-                yrdata=treat_rwp.objects.filter(year=dd[0],month=dd[1],device_id=device_id)
-                count=0
-                sums=0
-                avgs = 0
-                if yrdata:
-                    for yr in yrdata:
-                        yr_d_id=yr.device_id
-                        if yr_d_id == device_id:
-                            crt=yr.crt
-                            print("crt is:",crt)
-                            sums=sums+crt
-                            count=count+1
-                            print("sums is:",sums)
-                            print("count is:",count)
-                    avgs=sums/count
-                hr=repo_monthly.objects.filter(year=dd[0],month=dd[1],device_id=device_id)
-                if hr:
-                    yr_data=repo_monthly.objects.filter(year=dd[0],month=dd[1],device_id=device_id).update(device_id=device_id,service='rwp_crt',sum=sums,count=count,avg=avgs,month=dd[1],year=dd[0])
-                else:
-                    yr_data=repo_monthly.objects.create(device_id=device_id,service='rwp_crt',sum=sums,count=count,avg=avgs,month=dd[1],year=dd[0])
-                    yr_data.save()
-                
-                # day
-                yrdata=treat_rwp.objects.filter(year=dd[0],month=dd[1],day=dd[2],device_id=device_id)
-                count=0
-                sums=0
-                avgs = 0
-                if yrdata:
-                    for yr in yrdata:
-                        yr_d_id=yr.device_id
-                        if yr_d_id == device_id:
-                            crt=yr.crt
-                            print("crt is:",crt)
-                            sums=sums+crt
-                            count=count+1
-                            print("sums is:",sums)
-                            print("count is:",count)
-                    avgs=sums/count
-                hr=repo_daily.objects.filter(year=dd[0],month=dd[1],day=dd[2],device_id=device_id)
-                if hr:
-                    yr_data=repo_daily.objects.filter(year=dd[0],month=dd[1],day=dd[2],device_id=device_id).update(device_id=device_id,service='rwp_crt',sum=sums,count=count,avg=avgs,month=dd[1],year=dd[0],day=dd[2])
-                else:
-                    yr_data=repo_daily.objects.create(device_id=device_id,service='rwp_crt',sum=sums,count=count,avg=avgs,month=dd[1],year=dd[0],day=dd[2])
-                    yr_data.save()
-                
-                # hour
+
+                 # hour
                 yrdata=treat_rwp.objects.filter(year=dd[0],month=dd[1],day=dd[2],hour=dd[3],device_id=device_id)
                 count=0
-                sums=0
-                avgs = 0
+                sumd={}
+                sums_cnd=0
+                sums_spn=0
+                sums_tsp=0
+                sums_asp=0
+                avgs_cnd = 0
+                avgs_spn = 0
+                avgs_tsp = 0
+                avgs_asp = 0
                 if yrdata:
                     for yr in yrdata:
                         yr_d_id=yr.device_id
                         if yr_d_id == device_id:
-                            crt=yr.crt
-                            print("crt is:",crt)
-                            sums=sums+crt
+                            cnds=yr.crt
+                            spns=yr.olc
+                            tsps=yr.drc
+                            asps=yr.spn
+                            print("cnds is:",cnds)
+                            sums_cnd=sums_cnd+cnds
+                            sums_spn=sums_spn+spns
+                            sums_tsp=sums_tsp+tsps
+                            sums_asp=sums_asp+asps
                             count=count+1
-                            print("sums is:",sums)
+                            print("sums is:",sums_cnd)
                             print("count is:",count)
-                    avgs=sums/count
-                
-                hr=repo_hourly.objects.filter(year=dd[0],month=dd[1],day=dd[2],hour=dd[3],device_id=device_id)
+                    avgs_cnd=sums_cnd/count
+                    avgs_spn=sums_spn/count
+                    avgs_tsp=sums_tsp/count
+                    avgs_asp=sums_asp/count
+                    print("@@@")
+               
+                hr=rwp_repo_hourly.objects.filter(year=dd[0],month=dd[1],day=dd[2],hour=dd[3],device_id=device_id)
                 if hr:
-                    yr_data=repo_hourly.objects.filter(year=dd[0],month=dd[1],day=dd[2],hour=dd[3],device_id=device_id).update(device_id=device_id,service='rwp_crt',sum=sums,count=count,avg=avgs,hour=dd[3],month=dd[1],year=dd[0],day=dd[2])
+                    yr_data=rwp_repo_hourly.objects.filter(year=dd[0],month=dd[1],day=dd[2],hour=dd[3],device_id=device_id).update(device_id=device_id,service='rwp_crt',crt={'sum_crt':sums_cnd,'avg_crt':avgs_cnd,'count':count},olc={'sum_olc':sums_spn,'avg_olc':avgs_spn,'count':count},drc={'sum_drc':sums_tsp,'avg_drc':avgs_tsp,'count':count},spn={'sum_spn':sums_asp,'avg_spn':avgs_asp,'count':count},hour=dd[3],month=dd[1],year=dd[0],day=dd[2])
                 else:
-                    yr_data=repo_hourly.objects.create(device_id=device_id,service='rwp_crt',sum=sums,count=count,avg=avgs,hour=dd[3],month=dd[1],year=dd[0],day=dd[2])
+                    yr_data=rwp_repo_hourly.objects.create(device_id=device_id,service='rwp_crt',crt={'sum_crt':sums_cnd,'avg_crt':avgs_cnd,'count':count},olc={'sum_olc':sums_spn,'avg_olc':avgs_spn,'count':count},drc={'sum_drc':sums_tsp,'avg_drc':avgs_tsp,'count':count},spn={'sum_spn':sums_asp,'avg_spn':avgs_asp,'count':count},hour=dd[3],month=dd[1],year=dd[0],day=dd[2])
                     yr_data.save()
+               
+                 # day
+                yrdata=rwp_repo_hourly.objects.filter(year=dd[0],month=dd[1],day=dd[2],device_id=device_id)
+                count=0
+                count_sum=0
+                count_cnd=0
+                count_spn=0
+                count_tsp=0
+                count_asp=0
+                sums_cnd=0
+                sums_spn=0
+                sums_tsp=0
+                sums_asp=0
+                avgs_cnd = 0
+                avgs_spn = 0
+                avgs_tsp = 0
+                avgs_asp = 0
+                if yrdata:
+                    for yr in yrdata:
+                        print("day for loop")
+                        yr_d_id=yr.device_id
+                        if yr_d_id == device_id:
+                            print("in if")
+                            cnds_d=yr.crt
+                            spns_d=yr.olc
+                            tsps_d=yr.drc
+                            asps_d=yr.spn
+                            sums_d=list(cnds_d.values())[0]
+                            sums_s=list(spns_d.values())[0]
+                            sums_t=list(tsps_d.values())[0]
+                            sums_a=list(asps_d.values())[0]
+                            # avgs_cnd=list(cnds.values())[1]
+                            count_cnd=list(cnds_d.values())[2]
+                            # for k,v in cnds.items():
+                            sums_cnd=sums_cnd+sums_d
+                            sums_spn=sums_spn+sums_s
+                            sums_tsp=sums_tsp+sums_t
+                            sums_asp=sums_asp+sums_a
+                            count_sum=count_sum+count_cnd
+
+
+                            print("sum from dict:",sums_cnd,type(sums_cnd))
+                            # spns=yr.spn[1]
+                            # tsps=yr.tsp[2]
+                            # asps=yr.asp[3]
+                            print("cnds is:",cnds)
+                            # sums_cnd=sums_cnd+cnds
+                            # sums_spn=sums_spn+spns
+                            # sums_tsp=sums_tsp+tsps
+                            # sums_asp=sums_asp+asps
+                            count=count+1
+                            print("count is:",count)
+                    print("sums is:",sums_cnd)
+                    print("countsum is:",count_sum)
+                    avgs_cnd=sums_cnd/count_sum
+                    print("average cnd is:",avgs_cnd)
+
+                    avgs_spn=sums_spn/count_sum
+                    print("avg of spn:",avgs_spn)
+                    avgs_tsp=sums_tsp/count_sum
+                    avgs_asp=sums_asp/count_sum
+                hr=rwp_repo_daily.objects.filter(year=dd[0],month=dd[1],day=dd[2],device_id=device_id)
+                if hr:
+                    print("in if hr")
+                    yr_data=rwp_repo_daily.objects.filter(year=dd[0],month=dd[1],day=dd[2],device_id=device_id).update(device_id=device_id,service='cnd_tds_cnd',crt={'sum_crt':sums_cnd,'avg_crt':avgs_cnd,'count':count},olc={'sum_olc':sums_spn,'avg_olc':avgs_spn,'count':count},drc={'sum_drc':sums_tsp,'avg_drc':avgs_tsp,'count':count},spn={'sum_spn':sums_asp,'avg_spn':avgs_asp,'count':count},month=dd[1],year=dd[0],day=dd[2],hour=dd[3])
+                    print("data insertedd")
+                else:
+                    yr_data=rwp_repo_daily.objects.create(device_id=device_id,service='cnd_tds_cnd',crt={'sum_crt':sums_cnd,'avg_crt':avgs_cnd,'count':count},olc={'sum_olc':sums_spn,'avg_olc':avgs_spn,'count':count},drc={'sum_drc':sums_tsp,'avg_drc':avgs_tsp,'count':count},spn={'sum_spn':sums_asp,'avg_spn':avgs_asp,'count':count},month=dd[1],year=dd[0],day=dd[2],hour=dd[3])
+                    yr_data.save()
+                #monthly
+                yrdata=rwp_repo_daily.objects.filter(year=dd[0],month=dd[1],device_id=device_id)
+                count=0
+                sums_cnd=0
+                sums_spn=0
+                sums_tsp=0
+                sums_asp=0
+                avgs_cnd = 0
+                avgs_spn = 0
+                avgs_tsp = 0
+                avgs_asp = 0
+                if yrdata:
+                    for yr in yrdata:
+                        yr_d_id=yr.device_id
+                        if yr_d_id == device_id:
+                            cnds_m=yr.crt
+                            spns_m=yr.olc
+                            tsps_m=yr.drc
+                            asps_m=yr.spn
+                            sums_d=list(cnds_m.values())[0]
+                            sums_s=list(spns_m.values())[0]
+                            sums_t=list(tsps_m.values())[0]
+                            sums_a=list(asps_m.values())[0]
+                            # avgs_cnd=list(cnds.values())[1]
+                            count_cnd=list(cnds_d.values())[2]
+                            # for k,v in cnds.items():
+                            sums_cnd=sums_cnd+sums_d
+                            sums_spn=sums_spn+sums_s
+                            sums_tsp=sums_tsp+sums_t
+                            sums_asp=sums_asp+sums_a
+                            count_sum=count_sum+count_cnd
+
+
+                            print("sum from dict:",sums_cnd,type(sums_cnd))
+                            # spns=yr.spn[1]
+                            # tsps=yr.tsp[2]
+                            # asps=yr.asp[3]
+                            print("cnds is:",cnds)
+                            # sums_cnd=sums_cnd+cnds
+                            # sums_spn=sums_spn+spns
+                            # sums_tsp=sums_tsp+tsps
+                            # sums_asp=sums_asp+asps
+                            count=count+1
+                            print("count is:",count)
+                    print("sums is:",sums_cnd)
+                    print("countsum is:",count_sum)
+                    avgs_cnd=sums_cnd/count_sum
+                    print("average cnd is:",avgs_cnd)
+
+                    avgs_spn=sums_spn/count_sum
+                    print("avg of spn:",avgs_spn)
+                    avgs_tsp=sums_tsp/count_sum
+                    avgs_asp=sums_asp/count_sum
+                hr=rwp_repo_monthly.objects.filter(year=dd[0],month=dd[1],device_id=device_id)
+                if hr:
+                    yr_data=rwp_repo_monthly.objects.filter(year=dd[0],month=dd[1],device_id=device_id).update(device_id=device_id,service='cnd_tds_cnd',crt={'sum_crt':sums_cnd,'avg_crt':avgs_cnd,'count':count},olc={'sum_olc':sums_spn,'avg_olc':avgs_spn,'count':count},drc={'sum_drc':sums_tsp,'avg_drc':avgs_tsp,'count':count},spn={'sum_spn':sums_asp,'avg_spn':avgs_asp,'count':count},month=dd[1],year=dd[0],day=dd[2],hour=dd[3])
+                else:
+                    yr_data=rwp_repo_monthly.objects.create(device_id=device_id,service='cnd_tds_cnd',crt={'sum_crt':sums_cnd,'avg_crt':avgs_cnd,'count':count},olc={'sum_olc':sums_spn,'avg_olc':avgs_spn,'count':count},drc={'sum_drc':sums_tsp,'avg_drc':avgs_tsp,'count':count},spn={'sum_spn':sums_asp,'avg_spn':avgs_asp,'count':count},month=dd[1],year=dd[0],day=dd[2],hour=dd[3])
+                    yr_data.save()
+               
+                # year
+                yrdata=rwp_repo_monthly.objects.filter(year=dd[0],device_id=device_id)
+                count=0
+                sums_cnd=0
+                sums_spn=0
+                sums_tsp=0
+                sums_asp=0
+                avgs_cnd = 0
+                avgs_spn = 0
+                avgs_tsp = 0
+                avgs_asp = 0
+                if yrdata:
+                    for yr in yrdata:
+                        yr_d_id=yr.device_id
+                        if yr_d_id == device_id:
+                            cnds_m=yr.crt
+                            spns_m=yr.olc
+                            tsps_m=yr.drc
+                            asps_m=yr.spn
+                            sums_d=list(cnds_m.values())[0]
+                            sums_s=list(spns_m.values())[0]
+                            sums_t=list(tsps_m.values())[0]
+                            sums_a=list(asps_m.values())[0]
+                            # avgs_cnd=list(cnds.values())[1]
+                            count_cnd=list(cnds_d.values())[2]
+                            # for k,v in cnds.items():
+                            sums_cnd=sums_cnd+sums_d
+                            sums_spn=sums_spn+sums_s
+                            sums_tsp=sums_tsp+sums_t
+                            sums_asp=sums_asp+sums_a
+                            count_sum=count_sum+count_cnd
+
+
+                            print("sum from dict:",sums_cnd,type(sums_cnd))
+                            # spns=yr.spn[1]
+                            # tsps=yr.tsp[2]
+                            # asps=yr.asp[3]
+                            print("cnds is:",cnds)
+                            # sums_cnd=sums_cnd+cnds
+                            # sums_spn=sums_spn+spns
+                            # sums_tsp=sums_tsp+tsps
+                            # sums_asp=sums_asp+asps
+                            count=count+1
+                            print("count is:",count)
+                    print("sums is:",sums_cnd)
+                    print("countsum is:",count_sum)
+                    avgs_cnd=sums_cnd/count_sum
+                    print("average cnd is:",avgs_cnd)
+
+                    avgs_spn=sums_spn/count_sum
+                    print("avg of spn:",avgs_spn)
+                    avgs_tsp=sums_tsp/count_sum
+                    avgs_asp=sums_asp/count_sum
+                hr=rwp_repo_yearly.objects.filter(year=dd[0],device_id=device_id)
+                if hr:
+                    yr_data=rwp_repo_yearly.objects.filter(device_id=device_id).update(device_id=device_id,service='cnd_tds_cnd',crt={'sum_crt':sums_cnd,'avg_crt':avgs_cnd,'count':count},olc={'sum_olc':sums_spn,'avg_olc':avgs_spn,'count':count},drc={'sum_drc':sums_tsp,'avg_drc':avgs_tsp,'count':count},spn={'sum_spn':sums_asp,'avg_spn':avgs_asp,'count':count},month=dd[1],year=dd[0],day=dd[2],hour=dd[3])
+                else:
+                    yr_data=rwp_repo_yearly.objects.create(device_id=device_id,service='cnd_tds_cnd',crt={'sum_crt':sums_cnd,'avg_crt':avgs_cnd,'count':count},olc={'sum_olc':sums_spn,'avg_olc':avgs_spn,'count':count},drc={'sum_drc':sums_tsp,'avg_drc':avgs_tsp,'count':count},spn={'sum_spn':sums_asp,'avg_spn':avgs_asp,'count':count},month=dd[1],year=dd[0],day=dd[2],hour=dd[3])
+                    yr_data.save()
+                    
+                # yrdata=treat_rwp.objects.filter(year=dd[0],device_id=device_id)
+                # count=0
+                # sums=0
+                # avgs = 0
+                # if yrdata:
+                #     for yr in yrdata:
+                #         yr_d_id=yr.device_id
+                #         if yr_d_id == device_id:
+                #             crt=yr.crt
+                #             print("crt is:",crt)
+                #             sums=sums+crt
+                #             count=count+1
+                #             print("sums is:",sums)
+                #             print("count is:",count)
+                #     avgs=sums/count
+                #     print('avg is:',avgs)
+                # hr=repo_yearly.objects.filter(year=dd[0],device_id=device_id)
+                # if hr:
+                #     yr_data=repo_yearly.objects.filter(device_id=device_id).update(device_id=device_id,service='rwp_crt',sum=sums,count=count,avg=avgs,month=dd[1],year=dd[0])
+                # else:
+                #     yr_data=repo_yearly.objects.create(device_id=device_id,service='rwp_crt',sum=sums,count=count,avg=avgs,month=dd[1],year=dd[0])
+                #     yr_data.save()
+                
+                # # month
+                # yrdata=treat_rwp.objects.filter(year=dd[0],month=dd[1],device_id=device_id)
+                # count=0
+                # sums=0
+                # avgs = 0
+                # if yrdata:
+                #     for yr in yrdata:
+                #         yr_d_id=yr.device_id
+                #         if yr_d_id == device_id:
+                #             crt=yr.crt
+                #             print("crt is:",crt)
+                #             sums=sums+crt
+                #             count=count+1
+                #             print("sums is:",sums)
+                #             print("count is:",count)
+                #     avgs=sums/count
+                # hr=repo_monthly.objects.filter(year=dd[0],month=dd[1],device_id=device_id)
+                # if hr:
+                #     yr_data=repo_monthly.objects.filter(year=dd[0],month=dd[1],device_id=device_id).update(device_id=device_id,service='rwp_crt',sum=sums,count=count,avg=avgs,month=dd[1],year=dd[0])
+                # else:
+                #     yr_data=repo_monthly.objects.create(device_id=device_id,service='rwp_crt',sum=sums,count=count,avg=avgs,month=dd[1],year=dd[0])
+                #     yr_data.save()
+                
+                # # day
+                # yrdata=treat_rwp.objects.filter(year=dd[0],month=dd[1],day=dd[2],device_id=device_id)
+                # count=0
+                # sums=0
+                # avgs = 0
+                # if yrdata:
+                #     for yr in yrdata:
+                #         yr_d_id=yr.device_id
+                #         if yr_d_id == device_id:
+                #             crt=yr.crt
+                #             print("crt is:",crt)
+                #             sums=sums+crt
+                #             count=count+1
+                #             print("sums is:",sums)
+                #             print("count is:",count)
+                #     avgs=sums/count
+                # hr=repo_daily.objects.filter(year=dd[0],month=dd[1],day=dd[2],device_id=device_id)
+                # if hr:
+                #     yr_data=repo_daily.objects.filter(year=dd[0],month=dd[1],day=dd[2],device_id=device_id).update(device_id=device_id,service='rwp_crt',sum=sums,count=count,avg=avgs,month=dd[1],year=dd[0],day=dd[2])
+                # else:
+                #     yr_data=repo_daily.objects.create(device_id=device_id,service='rwp_crt',sum=sums,count=count,avg=avgs,month=dd[1],year=dd[0],day=dd[2])
+                #     yr_data.save()
+                
+                # # hour
+                # yrdata=treat_rwp.objects.filter(year=dd[0],month=dd[1],day=dd[2],hour=dd[3],device_id=device_id)
+                # count=0
+                # sums=0
+
+                # avgs = 0
+                # if yrdata:
+                #     for yr in yrdata:
+                #         yr_d_id=yr.device_id
+                #         if yr_d_id == device_id:
+                #             crt=yr.crt
+                #             print("crt is:",crt)
+                #             sums=sums+crt
+                #             count=count+1
+                #             print("sums is:",sums)
+                #             print("count is:",count)
+                #     avgs=sums/count
+                
+                # hr=repo_hourly.objects.filter(year=dd[0],month=dd[1],day=dd[2],hour=dd[3],device_id=device_id)
+                # if hr:
+                #     yr_data=repo_hourly.objects.filter(year=dd[0],month=dd[1],day=dd[2],hour=dd[3],device_id=device_id).update(device_id=device_id,service='rwp_crt',sum=sums,count=count,avg=avgs,hour=dd[3],month=dd[1],year=dd[0],day=dd[2])
+                # else:
+                #     yr_data=repo_hourly.objects.create(device_id=device_id,service='rwp_crt',sum=sums,count=count,avg=avgs,hour=dd[3],month=dd[1],year=dd[0],day=dd[2])
+                #     yr_data.save()
                 
         
         except Exception as e:
@@ -841,94 +1260,322 @@ def testo(request):
 
                 ds=treat_hpp.objects.create(device_id=device_id,message_type=msg_type,sts=sts,crt=crt,olc=olc,drc=drc,spn=spn,year=dd[0],month=dd[1],day=dd[2],hour=dd[3],minit=dd[4],second=dd[5])
                 ds.save()
-                yrdata=treat_hpp.objects.filter(year=dd[0],device_id=device_id)
-                count=0
-                sums=0
-                avgs = 0
-                if yrdata:
-                    for yr in yrdata:
-                        yr_d_id=yr.device_id
-                        if yr_d_id == device_id:
-                            crt=yr.crt
-                            print("crt is:",crt)
-                            sums=sums+crt
-                            count=count+1
-                            print("sums is:",sums)
-                            print("count is:",count)
-                    avgs=sums/count
-                    print('avg is:',avgs)
-                hr=repo_yearly.objects.filter(year=dd[0],device_id=device_id)
-                if hr:
-                    yr_data=repo_yearly.objects.filter(device_id=device_id).update(device_id=device_id,service='hpp_crt',sum=sums,count=count,avg=avgs,month=dd[1],year=dd[0])
-                else:
-                    yr_data=repo_yearly.objects.create(device_id=device_id,service='hpp_crt',sum=sums,count=count,avg=avgs,month=dd[1],year=dd[0])
-                    yr_data.save()
-                # month
-                yrdata=treat_hpp.objects.filter(year=dd[0],month=dd[1],device_id=device_id)
-                count=0
-                sums=0
-                avgs = 0
-                if yrdata:
-                    for yr in yrdata:
-                        yr_d_id=yr.device_id
-                        if yr_d_id == device_id:
-                            crt=yr.crt
-                            print("crt is:",crt)
-                            sums=sums+crt
-                            count=count+1
-                            print("sums is:",sums)
-                            print("count is:",count)
-                    avgs=sums/count
-                hr=repo_monthly.objects.filter(year=dd[0],month=dd[1],device_id=device_id)
-                if hr:
-                    yr_data=repo_monthly.objects.filter(year=dd[0],month=dd[1],device_id=device_id).update(device_id=device_id,service='hpp_crt',sum=sums,count=count,avg=avgs,month=dd[1],year=dd[0])
-                else:
-                    yr_data=repo_monthly.objects.create(device_id=device_id,service='hpp_crt',sum=sums,count=count,avg=avgs,month=dd[1],year=dd[0])
-                    yr_data.save()
-                # day
-                yrdata=treat_hpp.objects.filter(year=dd[0],month=dd[1],day=dd[2],device_id=device_id)
-                count=0
-                sums=0
-                avgs = 0
-                if yrdata:
-                    for yr in yrdata:
-                        yr_d_id=yr.device_id
-                        if yr_d_id == device_id:
-                            crt=yr.crt
-                            print("crt is:",crt)
-                            sums=sums+crt
-                            count=count+1
-                            print("sums is:",sums)
-                            print("count is:",count)
-                    avgs=sums/count
-                hr=repo_daily.objects.filter(year=dd[0],month=dd[1],day=dd[2],device_id=device_id)
-                if hr:
-                    yr_data=repo_daily.objects.filter(year=dd[0],month=dd[1],day=dd[2],device_id=device_id).update(device_id=device_id,service='hpp_crt',sum=sums,count=count,avg=avgs,month=dd[1],year=dd[0],day=dd[2])
-                else:
-                    yr_data=repo_daily.objects.create(device_id=device_id,service='hpp_crt',sum=sums,count=count,avg=avgs,month=dd[1],year=dd[0],day=dd[2])
-                    yr_data.save()
-                # hour
+                 # hour
                 yrdata=treat_hpp.objects.filter(year=dd[0],month=dd[1],day=dd[2],hour=dd[3],device_id=device_id)
                 count=0
-                sums=0
-                avgs = 0
+                sumd={}
+                sums_cnd=0
+                sums_spn=0
+                sums_tsp=0
+                sums_asp=0
+                avgs_cnd = 0
+                avgs_spn = 0
+                avgs_tsp = 0
+                avgs_asp = 0
                 if yrdata:
                     for yr in yrdata:
                         yr_d_id=yr.device_id
                         if yr_d_id == device_id:
-                            crt=yr.crt
-                            print("crt is:",crt)
-                            sums=sums+crt
+                            cnds=yr.crt
+                            spns=yr.olc
+                            tsps=yr.drc
+                            asps=yr.spn
+                            print("cnds is:",cnds)
+                            sums_cnd=sums_cnd+cnds
+                            sums_spn=sums_spn+spns
+                            sums_tsp=sums_tsp+tsps
+                            sums_asp=sums_asp+asps
                             count=count+1
-                            print("sums is:",sums)
+                            print("sums is:",sums_cnd)
                             print("count is:",count)
-                    avgs=sums/count
-                hr=repo_hourly.objects.filter(year=dd[0],month=dd[1],day=dd[2],hour=dd[3],device_id=device_id)
+                    avgs_cnd=sums_cnd/count
+                    avgs_spn=sums_spn/count
+                    avgs_tsp=sums_tsp/count
+                    avgs_asp=sums_asp/count
+                    print("@@@")
+               
+                hr=hpp_repo_hourly.objects.filter(year=dd[0],month=dd[1],day=dd[2],hour=dd[3],device_id=device_id)
                 if hr:
-                    yr_data=repo_hourly.objects.filter(year=dd[0],month=dd[1],day=dd[2],hour=dd[3],device_id=device_id).update(device_id=device_id,service='hpp_crt',sum=sums,count=count,avg=avgs,hour=dd[3],month=dd[1],year=dd[0],day=dd[2])
+                    yr_data=hpp_repo_hourly.objects.filter(year=dd[0],month=dd[1],day=dd[2],hour=dd[3],device_id=device_id).update(device_id=device_id,service='rwp_crt',crt={'sum_crt':sums_cnd,'avg_crt':avgs_cnd,'count':count},olc={'sum_olc':sums_spn,'avg_olc':avgs_spn,'count':count},drc={'sum_drc':sums_tsp,'avg_drc':avgs_tsp,'count':count},spn={'sum_spn':sums_asp,'avg_spn':avgs_asp,'count':count},hour=dd[3],month=dd[1],year=dd[0],day=dd[2])
                 else:
-                    yr_data=repo_hourly.objects.create(device_id=device_id,service='hpp_crt',sum=sums,count=count,avg=avgs,hour=dd[3],month=dd[1],year=dd[0],day=dd[2])
+                    yr_data=hpp_repo_hourly.objects.create(device_id=device_id,service='rwp_crt',crt={'sum_crt':sums_cnd,'avg_crt':avgs_cnd,'count':count},olc={'sum_olc':sums_spn,'avg_olc':avgs_spn,'count':count},drc={'sum_drc':sums_tsp,'avg_drc':avgs_tsp,'count':count},spn={'sum_spn':sums_asp,'avg_spn':avgs_asp,'count':count},hour=dd[3],month=dd[1],year=dd[0],day=dd[2])
                     yr_data.save()
+               
+                 # day
+                yrdata=hpp_repo_hourly.objects.filter(year=dd[0],month=dd[1],day=dd[2],device_id=device_id)
+                count=0
+                count_sum=0
+                count_cnd=0
+                count_spn=0
+                count_tsp=0
+                count_asp=0
+                sums_cnd=0
+                sums_spn=0
+                sums_tsp=0
+                sums_asp=0
+                avgs_cnd = 0
+                avgs_spn = 0
+                avgs_tsp = 0
+                avgs_asp = 0
+                if yrdata:
+                    for yr in yrdata:
+                        print("day for loop")
+                        yr_d_id=yr.device_id
+                        if yr_d_id == device_id:
+                            print("in if")
+                            cnds_d=yr.crt
+                            spns_d=yr.olc
+                            tsps_d=yr.drc
+                            asps_d=yr.spn
+                            sums_d=list(cnds_d.values())[0]
+                            sums_s=list(spns_d.values())[0]
+                            sums_t=list(tsps_d.values())[0]
+                            sums_a=list(asps_d.values())[0]
+                            # avgs_cnd=list(cnds.values())[1]
+                            count_cnd=list(cnds_d.values())[2]
+                            # for k,v in cnds.items():
+                            sums_cnd=sums_cnd+sums_d
+                            sums_spn=sums_spn+sums_s
+                            sums_tsp=sums_tsp+sums_t
+                            sums_asp=sums_asp+sums_a
+                            count_sum=count_sum+count_cnd
+
+
+                            print("sum from dict:",sums_cnd,type(sums_cnd))
+                            # spns=yr.spn[1]
+                            # tsps=yr.tsp[2]
+                            # asps=yr.asp[3]
+                            print("cnds is:",cnds)
+                            # sums_cnd=sums_cnd+cnds
+                            # sums_spn=sums_spn+spns
+                            # sums_tsp=sums_tsp+tsps
+                            # sums_asp=sums_asp+asps
+                            count=count+1
+                            print("count is:",count)
+                    print("sums is:",sums_cnd)
+                    print("countsum is:",count_sum)
+                    avgs_cnd=sums_cnd/count_sum
+                    print("average cnd is:",avgs_cnd)
+
+                    avgs_spn=sums_spn/count_sum
+                    print("avg of spn:",avgs_spn)
+                    avgs_tsp=sums_tsp/count_sum
+                    avgs_asp=sums_asp/count_sum
+                hr=hpp_repo_daily.objects.filter(year=dd[0],month=dd[1],day=dd[2],device_id=device_id)
+                if hr:
+                    print("in if hr")
+                    yr_data=hpp_repo_daily.objects.filter(year=dd[0],month=dd[1],day=dd[2],device_id=device_id).update(device_id=device_id,service='cnd_tds_cnd',crt={'sum_crt':sums_cnd,'avg_crt':avgs_cnd,'count':count},olc={'sum_olc':sums_spn,'avg_olc':avgs_spn,'count':count},drc={'sum_drc':sums_tsp,'avg_drc':avgs_tsp,'count':count},spn={'sum_spn':sums_asp,'avg_spn':avgs_asp,'count':count},month=dd[1],year=dd[0],day=dd[2],hour=dd[3])
+                    print("data insertedd")
+                else:
+                    yr_data=hpp_repo_daily.objects.create(device_id=device_id,service='cnd_tds_cnd',crt={'sum_crt':sums_cnd,'avg_crt':avgs_cnd,'count':count},olc={'sum_olc':sums_spn,'avg_olc':avgs_spn,'count':count},drc={'sum_drc':sums_tsp,'avg_drc':avgs_tsp,'count':count},spn={'sum_spn':sums_asp,'avg_spn':avgs_asp,'count':count},month=dd[1],year=dd[0],day=dd[2],hour=dd[3])
+                    yr_data.save()
+                #monthly
+                yrdata=hpp_repo_daily.objects.filter(year=dd[0],month=dd[1],device_id=device_id)
+                count=0
+                sums_cnd=0
+                sums_spn=0
+                sums_tsp=0
+                sums_asp=0
+                avgs_cnd = 0
+                avgs_spn = 0
+                avgs_tsp = 0
+                avgs_asp = 0
+                if yrdata:
+                    for yr in yrdata:
+                        yr_d_id=yr.device_id
+                        if yr_d_id == device_id:
+                            cnds_m=yr.crt
+                            spns_m=yr.olc
+                            tsps_m=yr.drc
+                            asps_m=yr.spn
+                            sums_d=list(cnds_m.values())[0]
+                            sums_s=list(spns_m.values())[0]
+                            sums_t=list(tsps_m.values())[0]
+                            sums_a=list(asps_m.values())[0]
+                            # avgs_cnd=list(cnds.values())[1]
+                            count_cnd=list(cnds_d.values())[2]
+                            # for k,v in cnds.items():
+                            sums_cnd=sums_cnd+sums_d
+                            sums_spn=sums_spn+sums_s
+                            sums_tsp=sums_tsp+sums_t
+                            sums_asp=sums_asp+sums_a
+                            count_sum=count_sum+count_cnd
+
+
+                            print("sum from dict:",sums_cnd,type(sums_cnd))
+                            # spns=yr.spn[1]
+                            # tsps=yr.tsp[2]
+                            # asps=yr.asp[3]
+                            print("cnds is:",cnds)
+                            # sums_cnd=sums_cnd+cnds
+                            # sums_spn=sums_spn+spns
+                            # sums_tsp=sums_tsp+tsps
+                            # sums_asp=sums_asp+asps
+                            count=count+1
+                            print("count is:",count)
+                    print("sums is:",sums_cnd)
+                    print("countsum is:",count_sum)
+                    avgs_cnd=sums_cnd/count_sum
+                    print("average cnd is:",avgs_cnd)
+
+                    avgs_spn=sums_spn/count_sum
+                    print("avg of spn:",avgs_spn)
+                    avgs_tsp=sums_tsp/count_sum
+                    avgs_asp=sums_asp/count_sum
+                hr=hpp_repo_monthly.objects.filter(year=dd[0],month=dd[1],device_id=device_id)
+                if hr:
+                    yr_data=hpp_repo_monthly.objects.filter(year=dd[0],month=dd[1],device_id=device_id).update(device_id=device_id,service='cnd_tds_cnd',crt={'sum_crt':sums_cnd,'avg_crt':avgs_cnd,'count':count},olc={'sum_olc':sums_spn,'avg_olc':avgs_spn,'count':count},drc={'sum_drc':sums_tsp,'avg_drc':avgs_tsp,'count':count},spn={'sum_spn':sums_asp,'avg_spn':avgs_asp,'count':count},month=dd[1],year=dd[0],day=dd[2],hour=dd[3])
+                else:
+                    yr_data=hpp_repo_monthly.objects.create(device_id=device_id,service='cnd_tds_cnd',crt={'sum_crt':sums_cnd,'avg_crt':avgs_cnd,'count':count},olc={'sum_olc':sums_spn,'avg_olc':avgs_spn,'count':count},drc={'sum_drc':sums_tsp,'avg_drc':avgs_tsp,'count':count},spn={'sum_spn':sums_asp,'avg_spn':avgs_asp,'count':count},month=dd[1],year=dd[0],day=dd[2],hour=dd[3])
+                    yr_data.save()
+               
+                # year
+                yrdata=hpp_repo_monthly.objects.filter(year=dd[0],device_id=device_id)
+                count=0
+                sums_cnd=0
+                sums_spn=0
+                sums_tsp=0
+                sums_asp=0
+                avgs_cnd = 0
+                avgs_spn = 0
+                avgs_tsp = 0
+                avgs_asp = 0
+                if yrdata:
+                    for yr in yrdata:
+                        yr_d_id=yr.device_id
+                        if yr_d_id == device_id:
+                            cnds_m=yr.crt
+                            spns_m=yr.olc
+                            tsps_m=yr.drc
+                            asps_m=yr.spn
+                            sums_d=list(cnds_m.values())[0]
+                            sums_s=list(spns_m.values())[0]
+                            sums_t=list(tsps_m.values())[0]
+                            sums_a=list(asps_m.values())[0]
+                            # avgs_cnd=list(cnds.values())[1]
+                            count_cnd=list(cnds_d.values())[2]
+                            # for k,v in cnds.items():
+                            sums_cnd=sums_cnd+sums_d
+                            sums_spn=sums_spn+sums_s
+                            sums_tsp=sums_tsp+sums_t
+                            sums_asp=sums_asp+sums_a
+                            count_sum=count_sum+count_cnd
+
+
+                            print("sum from dict:",sums_cnd,type(sums_cnd))
+                            # spns=yr.spn[1]
+                            # tsps=yr.tsp[2]
+                            # asps=yr.asp[3]
+                            print("cnds is:",cnds)
+                            # sums_cnd=sums_cnd+cnds
+                            # sums_spn=sums_spn+spns
+                            # sums_tsp=sums_tsp+tsps
+                            # sums_asp=sums_asp+asps
+                            count=count+1
+                            print("count is:",count)
+                    print("sums is:",sums_cnd)
+                    print("countsum is:",count_sum)
+                    avgs_cnd=sums_cnd/count_sum
+                    print("average cnd is:",avgs_cnd)
+
+                    avgs_spn=sums_spn/count_sum
+                    print("avg of spn:",avgs_spn)
+                    avgs_tsp=sums_tsp/count_sum
+                    avgs_asp=sums_asp/count_sum
+                hr=hpp_repo_yearly.objects.filter(year=dd[0],device_id=device_id)
+                if hr:
+                    yr_data=hpp_repo_yearly.objects.filter(device_id=device_id).update(device_id=device_id,service='cnd_tds_cnd',crt={'sum_crt':sums_cnd,'avg_crt':avgs_cnd,'count':count},olc={'sum_olc':sums_spn,'avg_olc':avgs_spn,'count':count},drc={'sum_drc':sums_tsp,'avg_drc':avgs_tsp,'count':count},spn={'sum_spn':sums_asp,'avg_spn':avgs_asp,'count':count},month=dd[1],year=dd[0],day=dd[2],hour=dd[3])
+                else:
+                    yr_data=hpp_repo_yearly.objects.create(device_id=device_id,service='cnd_tds_cnd',crt={'sum_crt':sums_cnd,'avg_crt':avgs_cnd,'count':count},olc={'sum_olc':sums_spn,'avg_olc':avgs_spn,'count':count},drc={'sum_drc':sums_tsp,'avg_drc':avgs_tsp,'count':count},spn={'sum_spn':sums_asp,'avg_spn':avgs_asp,'count':count},month=dd[1],year=dd[0],day=dd[2],hour=dd[3])
+                    yr_data.save()
+                
+                # count=0
+                # sums=0
+                # avgs = 0
+                # if yrdata:
+                #     for yr in yrdata:
+                #         yr_d_id=yr.device_id
+                #         if yr_d_id == device_id:
+                #             crt=yr.crt
+                #             print("crt is:",crt)
+                #             sums=sums+crt
+                #             count=count+1
+                #             print("sums is:",sums)
+                #             print("count is:",count)
+                #     avgs=sums/count
+                #     print('avg is:',avgs)
+                # hr=repo_yearly.objects.filter(year=dd[0],device_id=device_id)
+                # if hr:
+                #     yr_data=repo_yearly.objects.filter(device_id=device_id).update(device_id=device_id,service='hpp_crt',sum=sums,count=count,avg=avgs,month=dd[1],year=dd[0])
+                # else:
+                #     yr_data=repo_yearly.objects.create(device_id=device_id,service='hpp_crt',sum=sums,count=count,avg=avgs,month=dd[1],year=dd[0])
+                #     yr_data.save()
+                # # month
+                # yrdata=treat_hpp.objects.filter(year=dd[0],month=dd[1],device_id=device_id)
+                # count=0
+                # sums=0
+                # avgs = 0
+                # if yrdata:
+                #     for yr in yrdata:
+                #         yr_d_id=yr.device_id
+                #         if yr_d_id == device_id:
+                #             crt=yr.crt
+                #             print("crt is:",crt)
+                #             sums=sums+crt
+                #             count=count+1
+                #             print("sums is:",sums)
+                #             print("count is:",count)
+                #     avgs=sums/count
+                # hr=repo_monthly.objects.filter(year=dd[0],month=dd[1],device_id=device_id)
+                # if hr:
+                #     yr_data=repo_monthly.objects.filter(year=dd[0],month=dd[1],device_id=device_id).update(device_id=device_id,service='hpp_crt',sum=sums,count=count,avg=avgs,month=dd[1],year=dd[0])
+                # else:
+                #     yr_data=repo_monthly.objects.create(device_id=device_id,service='hpp_crt',sum=sums,count=count,avg=avgs,month=dd[1],year=dd[0])
+                #     yr_data.save()
+                # # day
+                # yrdata=treat_hpp.objects.filter(year=dd[0],month=dd[1],day=dd[2],device_id=device_id)
+                # count=0
+                # sums=0
+                # avgs = 0
+                # if yrdata:
+                #     for yr in yrdata:
+                #         yr_d_id=yr.device_id
+                #         if yr_d_id == device_id:
+                #             crt=yr.crt
+                #             print("crt is:",crt)
+                #             sums=sums+crt
+                #             count=count+1
+                #             print("sums is:",sums)
+                #             print("count is:",count)
+                #     avgs=sums/count
+                # hr=repo_daily.objects.filter(year=dd[0],month=dd[1],day=dd[2],device_id=device_id)
+                # if hr:
+                #     yr_data=repo_daily.objects.filter(year=dd[0],month=dd[1],day=dd[2],device_id=device_id).update(device_id=device_id,service='hpp_crt',sum=sums,count=count,avg=avgs,month=dd[1],year=dd[0],day=dd[2])
+                # else:
+                #     yr_data=repo_daily.objects.create(device_id=device_id,service='hpp_crt',sum=sums,count=count,avg=avgs,month=dd[1],year=dd[0],day=dd[2])
+                #     yr_data.save()
+                # # hour
+                # yrdata=treat_hpp.objects.filter(year=dd[0],month=dd[1],day=dd[2],hour=dd[3],device_id=device_id)
+                # count=0
+                # sums=0
+                # avgs = 0
+                # if yrdata:
+                #     for yr in yrdata:
+                #         yr_d_id=yr.device_id
+                #         if yr_d_id == device_id:
+                #             crt=yr.crt
+                #             print("crt is:",crt)
+                #             sums=sums+crt
+                #             count=count+1
+                #             print("sums is:",sums)
+                #             print("count is:",count)
+                #     avgs=sums/count
+                # hr=repo_hourly.objects.filter(year=dd[0],month=dd[1],day=dd[2],hour=dd[3],device_id=device_id)
+                # if hr:
+                #     yr_data=repo_hourly.objects.filter(year=dd[0],month=dd[1],day=dd[2],hour=dd[3],device_id=device_id).update(device_id=device_id,service='hpp_crt',sum=sums,count=count,avg=avgs,hour=dd[3],month=dd[1],year=dd[0],day=dd[2])
+                # else:
+                #     yr_data=repo_hourly.objects.create(device_id=device_id,service='hpp_crt',sum=sums,count=count,avg=avgs,hour=dd[3],month=dd[1],year=dd[0],day=dd[2])
+                #     yr_data.save()
                 
                 # end_date = local_tz.localize(datetime.datetime.now())
                 # print("first end date is:",end_date)

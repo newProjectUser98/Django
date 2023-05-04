@@ -389,12 +389,36 @@ class repo_history(models.Model):
     msg_json=models.JSONField(null=True,blank=True)
 
 
-class repo_hourly(models.Model):
+# class cnd_tds_repo_hourly(models.Model):
+#     device_id=models.CharField(max_length=100)
+#     service=models.CharField(max_length=100,null=True,blank=True)
+#     sum_cnd=models.BigIntegerField(null=True,blank=True)
+#     sum_spn=models.BigIntegerField(null=True,blank=True)
+#     sum_tsp=models.BigIntegerField(null=True,blank=True)
+#     sum_asp=models.BigIntegerField(null=True,blank=True)
+#     count=models.BigIntegerField(null=True,blank=True)
+#     avg_cnd=models.FloatField(null=True,blank=True)
+#     avg_spn=models.FloatField(null=True,blank=True)
+#     avg_tsp=models.FloatField(null=True,blank=True)
+#     avg_asp=models.FloatField(null=True,blank=True)
+#     # avg=models.f(null=True,blank=True)
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     updated_at = models.DateTimeField(auto_now=True) 
+#     month =  models.CharField(max_length=50)
+#     year =  models.CharField(max_length=50)
+#     day =  models.CharField(max_length=50)
+#     hour =  models.CharField(max_length=50)
+
+#     def __str__(self) -> str:
+#         return self.device_id,self.service,self.sum_cnd,self.count,self.avg_cnd,self.created_at,self.updated_at
+class cnd_tds_repo_hourly(models.Model):
+    id = models.BigAutoField(primary_key=True)
     device_id=models.CharField(max_length=100)
     service=models.CharField(max_length=100,null=True,blank=True)
-    sum=models.BigIntegerField(null=True,blank=True)
-    count=models.BigIntegerField(null=True,blank=True)
-    avg=models.FloatField(null=True,blank=True)
+    cnd=models.JSONField(null=True,blank=True)
+    spn=models.JSONField(null=True,blank=True)
+    tsp=models.JSONField(null=True,blank=True)
+    asp=models.JSONField(null=True,blank=True)
     # avg=models.f(null=True,blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True) 
@@ -404,44 +428,247 @@ class repo_hourly(models.Model):
     hour =  models.CharField(max_length=50)
 
     def __str__(self) -> str:
-        return self.device_id,self.service,self.sum,self.count,self.avg,self.created_at,self.updated_at
-class repo_daily(models.Model):
+        return self.device_id,self.service,self.cnd,self.spn,self.tsp,self.created_at,self.updated_at
+class rwp_repo_hourly(models.Model):
+    id = models.BigAutoField(primary_key=True)
     device_id=models.CharField(max_length=100)
     service=models.CharField(max_length=100,null=True,blank=True)
-    sum=models.BigIntegerField(null=True,blank=True)
-    count=models.BigIntegerField(null=True,blank=True)
-    avg=models.FloatField(null=True,blank=True)
+    crt=models.JSONField(null=True,blank=True)
+    olc=models.JSONField(null=True,blank=True)
+    drc=models.JSONField(null=True,blank=True)
+    spn=models.JSONField(null=True,blank=True)
+    # avg=models.f(null=True,blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True) 
     month =  models.CharField(max_length=50)
     year =  models.CharField(max_length=50)
     day =  models.CharField(max_length=50)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True) 
+    hour =  models.CharField(max_length=50)
+
     def __str__(self) -> str:
-        return self.device_id,self.service,self.sum,self.count,self.avg,self.created_at,self.updated_at
-class repo_monthly(models.Model):
+        return self.device_id,self.service,self.crt,self.spn,self.olc,self.created_at,self.updated_at
+class rwp_repo_daily(models.Model):
+    id = models.BigAutoField(primary_key=True)
     device_id=models.CharField(max_length=100)
     service=models.CharField(max_length=100,null=True,blank=True)
-    sum=models.BigIntegerField(null=True,blank=True)
-    count=models.BigIntegerField(null=True,blank=True)
-    avg=models.FloatField(null=True,blank=True)
-    month =  models.CharField(max_length=50)
-    year =  models.CharField(max_length=50)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True) 
-    def __str__(self) -> str:
-        return self.device_id,self.service,self.sum,self.count,self.avg,self.created_at,self.updated_at
-class repo_yearly(models.Model):
-    device_id=models.CharField(max_length=100)
-    service=models.CharField(max_length=100,null=True,blank=True)
-    sum=models.BigIntegerField(null=True,blank=True)
-    count=models.BigIntegerField(null=True,blank=True)
-    avg=models.FloatField(null=True,blank=True)
+    crt=models.JSONField(null=True,blank=True)
+    olc=models.JSONField(null=True,blank=True)
+    drc=models.JSONField(null=True,blank=True)
+    spn=models.JSONField(null=True,blank=True)
+    # avg=models.f(null=True,blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True) 
     month =  models.CharField(max_length=50)
     year =  models.CharField(max_length=50)
+    day =  models.CharField(max_length=50)
+    hour =  models.CharField(max_length=50)
+
     def __str__(self) -> str:
-        return self.device_id,self.service,self.sum,self.count,self.avg,self.created_at,self.updated_at
+        return self.device_id,self.service,self.crt,self.spn,self.olc,self.created_at,self.updated_at
+class rwp_repo_monthly(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    device_id=models.CharField(max_length=100)
+    service=models.CharField(max_length=100,null=True,blank=True)
+    crt=models.JSONField(null=True,blank=True)
+    olc=models.JSONField(null=True,blank=True)
+    drc=models.JSONField(null=True,blank=True)
+    spn=models.JSONField(null=True,blank=True)
+    # avg=models.f(null=True,blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True) 
+    month =  models.CharField(max_length=50)
+    year =  models.CharField(max_length=50)
+    day =  models.CharField(max_length=50)
+    hour =  models.CharField(max_length=50)
+
+    def __str__(self) -> str:
+        return self.device_id,self.service,self.crt,self.spn,self.olc,self.created_at,self.updated_at
+
+class rwp_repo_yearly(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    device_id=models.CharField(max_length=100)
+    service=models.CharField(max_length=100,null=True,blank=True)
+    crt=models.JSONField(null=True,blank=True)
+    olc=models.JSONField(null=True,blank=True)
+    drc=models.JSONField(null=True,blank=True)
+    spn=models.JSONField(null=True,blank=True)
+    # avg=models.f(null=True,blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True) 
+    month =  models.CharField(max_length=50)
+    year =  models.CharField(max_length=50)
+    day =  models.CharField(max_length=50)
+    hour =  models.CharField(max_length=50)
+
+    def __str__(self) -> str:
+        return self.device_id,self.service,self.crt,self.spn,self.olc,self.created_at,self.updated_at
+
+
+class hpp_repo_hourly(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    device_id=models.CharField(max_length=100)
+    service=models.CharField(max_length=100,null=True,blank=True)
+    crt=models.JSONField(null=True,blank=True)
+    olc=models.JSONField(null=True,blank=True)
+    drc=models.JSONField(null=True,blank=True)
+    spn=models.JSONField(null=True,blank=True)
+    # avg=models.f(null=True,blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True) 
+    month =  models.CharField(max_length=50)
+    year =  models.CharField(max_length=50)
+    day =  models.CharField(max_length=50)
+    hour =  models.CharField(max_length=50)
+
+    def __str__(self) -> str:
+        return self.device_id,self.service,self.crt,self.spn,self.olc,self.created_at,self.updated_at
+class hpp_repo_daily(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    device_id=models.CharField(max_length=100)
+    service=models.CharField(max_length=100,null=True,blank=True)
+    crt=models.JSONField(null=True,blank=True)
+    olc=models.JSONField(null=True,blank=True)
+    drc=models.JSONField(null=True,blank=True)
+    spn=models.JSONField(null=True,blank=True)
+    # avg=models.f(null=True,blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True) 
+    month =  models.CharField(max_length=50)
+    year =  models.CharField(max_length=50)
+    day =  models.CharField(max_length=50)
+    hour =  models.CharField(max_length=50)
+
+    def __str__(self) -> str:
+        return self.device_id,self.service,self.crt,self.spn,self.olc,self.created_at,self.updated_at
+
+class hpp_repo_monthly(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    device_id=models.CharField(max_length=100)
+    service=models.CharField(max_length=100,null=True,blank=True)
+    crt=models.JSONField(null=True,blank=True)
+    olc=models.JSONField(null=True,blank=True)
+    drc=models.JSONField(null=True,blank=True)
+    spn=models.JSONField(null=True,blank=True)
+    # avg=models.f(null=True,blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True) 
+    month =  models.CharField(max_length=50)
+    year =  models.CharField(max_length=50)
+    day =  models.CharField(max_length=50)
+    hour =  models.CharField(max_length=50)
+
+    def __str__(self) -> str:
+        return self.device_id,self.service,self.crt,self.spn,self.olc,self.created_at,self.updated_at
+
+class hpp_repo_yearly(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    device_id=models.CharField(max_length=100)
+    service=models.CharField(max_length=100,null=True,blank=True)
+    crt=models.JSONField(null=True,blank=True)
+    olc=models.JSONField(null=True,blank=True)
+    drc=models.JSONField(null=True,blank=True)
+    spn=models.JSONField(null=True,blank=True)
+    # avg=models.f(null=True,blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True) 
+    month =  models.CharField(max_length=50)
+    year =  models.CharField(max_length=50)
+    day =  models.CharField(max_length=50)
+    hour =  models.CharField(max_length=50)
+
+    def __str__(self) -> str:
+        return self.device_id,self.service,self.crt,self.spn,self.olc,self.created_at,self.updated_at
+class cnd_tds_repo_daily(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    device_id=models.CharField(max_length=100)
+    service=models.CharField(max_length=100,null=True,blank=True)
+    cnd=models.JSONField(null=True,blank=True)
+    spn=models.JSONField(null=True,blank=True)
+    tsp=models.JSONField(null=True,blank=True)
+    asp=models.JSONField(null=True,blank=True)
+    # avg=models.f(null=True,blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True) 
+    month =  models.CharField(max_length=50)
+    year =  models.CharField(max_length=50)
+    day =  models.CharField(max_length=50)
+    hour =  models.CharField(max_length=50)
+
+    def __str__(self) -> str:
+        return self.device_id,self.service,self.cnd,self.spn,self.tsp,self.created_at,self.updated_at
+# class repo_daily(models.Model):
+#     device_id=models.CharField(max_length=100)
+#     service=models.CharField(max_length=100,null=True,blank=True)
+#     sum=models.BigIntegerField(null=True,blank=True)
+#     count=models.BigIntegerField(null=True,blank=True)
+#     avg=models.FloatField(null=True,blank=True)
+#     month =  models.CharField(max_length=50)
+#     year =  models.CharField(max_length=50)
+#     day =  models.CharField(max_length=50)
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     updated_at = models.DateTimeField(auto_now=True) 
+#     def __str__(self) -> str:
+#         return self.device_id,self.service,self.sum,self.count,self.avg,self.created_at,self.updated_at
+class cnd_tds_repo_monthly(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    device_id=models.CharField(max_length=100)
+    service=models.CharField(max_length=100,null=True,blank=True)
+    cnd=models.JSONField(null=True,blank=True)
+    spn=models.JSONField(null=True,blank=True)
+    tsp=models.JSONField(null=True,blank=True)
+    asp=models.JSONField(null=True,blank=True)
+    # avg=models.f(null=True,blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True) 
+    month =  models.CharField(max_length=50)
+    year =  models.CharField(max_length=50)
+    day =  models.CharField(max_length=50)
+    hour =  models.CharField(max_length=50)
+
+    def __str__(self) -> str:
+        return self.device_id,self.service,self.cnd,self.spn,self.tsp,self.created_at,self.updated_at
+# class repo_monthly(models.Model):
+#     device_id=models.CharField(max_length=100)
+#     service=models.CharField(max_length=100,null=True,blank=True)
+#     sum=models.BigIntegerField(null=True,blank=True)
+#     count=models.BigIntegerField(null=True,blank=True)
+#     avg=models.FloatField(null=True,blank=True)
+#     month =  models.CharField(max_length=50)
+#     year =  models.CharField(max_length=50)
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     updated_at = models.DateTimeField(auto_now=True) 
+#     def __str__(self) -> str:
+#         return self.device_id,self.service,self.sum,self.count,self.avg,self.created_at,self.updated_at
+class cnd_tds_repo_yearly(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    device_id=models.CharField(max_length=100)
+    service=models.CharField(max_length=100,null=True,blank=True)
+    cnd=models.JSONField(null=True,blank=True)
+    spn=models.JSONField(null=True,blank=True)
+    tsp=models.JSONField(null=True,blank=True)
+    asp=models.JSONField(null=True,blank=True)
+    # avg=models.f(null=True,blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True) 
+    month =  models.CharField(max_length=50)
+    year =  models.CharField(max_length=50)
+    day =  models.CharField(max_length=50)
+    hour =  models.CharField(max_length=50)
+
+    def __str__(self) -> str:
+        return self.device_id,self.service,self.cnd,self.spn,self.tsp,self.created_at,self.updated_at
+# class repo_yearly(models.Model):
+#     device_id=models.CharField(max_length=100)
+#     service=models.CharField(max_length=100,null=True,blank=True)
+#     sum=models.BigIntegerField(null=True,blank=True)
+#     count=models.BigIntegerField(null=True,blank=True)
+#     avg=models.FloatField(null=True,blank=True)
+#     created_at = models.DateTimeField(auto_now_add=True)
+#     updated_at = models.DateTimeField(auto_now=True) 
+#     month =  models.CharField(max_length=50)
+#     year =  models.CharField(max_length=50)
+#     def __str__(self) -> str:
+#         return self.device_id,self.service,self.sum,self.count,self.avg,self.created_at,self.updated_at
     
 class device_info(models.Model):
     Device_id=models.CharField(max_length=100)

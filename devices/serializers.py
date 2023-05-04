@@ -62,7 +62,7 @@ class TopicSerializer(serializers.HyperlinkedModelSerializer):
 
 class YearlySerializer(serializers.HyperlinkedModelSerializer):
 	class Meta:
-		model = repo_yearly
+		model = cnd_tds_repo_yearly
 		fields=['device_id','service','sum','avg','count']
 
 class DeviceSerializer(serializers.HyperlinkedModelSerializer):
@@ -77,17 +77,17 @@ class KeySerializer(serializers.HyperlinkedModelSerializer):
 
 class HourlySerializer(serializers.HyperlinkedModelSerializer):
 	class Meta:
-		model = repo_hourly
+		model = cnd_tds_repo_hourly
 		fields='__all__'
 
 class MonthlySerializer(serializers.HyperlinkedModelSerializer):
 	class Meta:
-		model = repo_monthly
+		model = cnd_tds_repo_monthly
 		fields='__all__'
 
 class DailySerializer(serializers.HyperlinkedModelSerializer):
 	class Meta:
-		model = repo_daily
+		model = cnd_tds_repo_daily
 		fields='__all__'
 
 class GraphSerializer(serializers.HyperlinkedModelSerializer):
