@@ -63,7 +63,7 @@ for m in mapobj:
     # di=device_info.objects.filter(device_name==)
     comd={}
     rwp=Rwp_setting.objects.last()
-    comd.update({'olc':rwp.olc,'drc':rwp.drc,'spn':rwp.spn,'unit_type':rwp.unit_type,'company_name':rwp.company_name,'componant_name':rwp.componant_name})
+    comd.update({'olc':rwp.olc,'drc':rwp.drc,'spn':rwp.spn})
     print("comd",comd)
     print("rwp is:",rwp)
     print("olc is:",rwp.olc)
