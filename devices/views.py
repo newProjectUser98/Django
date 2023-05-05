@@ -26,6 +26,77 @@ from .serializers import *
 
 from django.http import JsonResponse
 from .mqttconn import client as mqtt_client
+import json
+
+from django.http import JsonResponse
+
+# from mqtt_test.mqtt import client as mqtt_client
+
+# from mqto.models import *
+mapobj=panel_setting.objects.all()
+cn1=str()
+cn=str()
+ut=str()
+print(mapobj,type(mapobj))
+for m in mapobj:
+    print(m.componant_name)
+    cn1=m.componant_name
+    cn=m.company_name
+    ut=m.unit_type
+    print(cn1)
+    print(cn)
+    print(ut)
+    print(panel_setting.componant_name)
+
+mapobj = panel_setting.objects.all()
+
+for m in mapobj:
+    setting_variable = m.spn  # or whichever setting variable you want to use
+    componant_name = m.componant_name
+    device = device_info.objects.filter(
+        setting_variable=setting_variable,
+        componant_name=componant_name
+    ).first()
+    if device:
+        device_id = device.Device_id
+        print("deviceId",device_id)
+    # di=device_info.objects.filter(device_name==)
+    comd={}
+    rwp=Rwp_setting.objects.last()
+    comd.update({'olc':rwp.olc,'drc':rwp.drc,'spn':rwp.spn,'unit_type':rwp.unit_type,'company_name':rwp.company_name,'componant_name':rwp.componant_name})
+    print("comd",comd)
+    print("rwp is:",rwp)
+    print("olc is:",rwp.olc)
+    print("drc is:",rwp.drc)
+    print("spn is:",rwp.spn)
+    print("unit_type is:",rwp.unit_type)
+    print("company_name is:",rwp.company_name)
+    print("componant_name:",rwp.componant_name)
+dinfo=device_info.objects.filter(componant_name=rwp.componant_name,unit_type=rwp.unit_type,company_name=rwp.company_name)
+# print("dinfo is:",dinfo.componant_name)
+cmpname=str()
+did=0
+for x in dinfo:
+    print("did id:",x.Device_id)
+    did=x.Device_id
+    cmpname=x.componant_name
+def publish_message(request):
+    # request_data = json.loads(request.body)
+    # testlist=['test/topic/1','test/topic/2']
+    # msg=input("Enter message:")
+
+    # for k,v in mapobj:
+
+    urlo=f"wc/{did}/updset/{cmpname}"
+    print("url is ",urlo)
+    testlist={f'wc/{did}/updset/{cmpname}':str(comd)}#,'test/topic/2':comd
+    print("****",testlist)
+    for k,v in testlist.items():
+        rc, mid = mqtt_client.publish(k,v)
+        # data=subscribers.objects.create(Topic=k,msg=v)
+        # data.save()
+    return JsonResponse({'code': rc})
+
 # from waterinn import mqttconn.mqttconn
 # from mqttconn.mqtt import client as mqtt_client
 # from mqttconn import mqtt
@@ -42,6 +113,8 @@ from .mqttconn import client as mqtt_client
 # medicines_collection = makemyrx_db['medicinedetails']
 
 from channels.consumer import SyncConsumer
+
+
 msgo=str()
 class EchoConsumer(SyncConsumer):
     def websocket_connect(self, event):
@@ -84,21 +157,21 @@ class TopicViewSet(viewsets.ModelViewSet):
 	# specify serializer to be used
 	serializer_class = TopicSerializer
         
-graphdata = graph_info.objects.last()
-print("graph data is:",graphdata.service_name,graphdata.device_id)
+# graphdata = graph_info.objects.last()
+# print("graph data is:",graphdata.service_name,graphdata.device_id)
 
-servi=graphdata.service_name
-ds_id=graphdata.device_id
-class YearlyViewset(viewsets.ModelViewSet):
-	# define queryset
-    global servi,ds_id
-    queryset = repo_yearly.objects.filter(service=servi,device_id=ds_id)
-    # graphdata = graph_info.objects.last()
-    # print("graph data is:",graphdata.service_name,graphdata.device_id)
+# servi=graphdata.service_name
+# ds_id=graphdata.device_id
+# class YearlyViewset(viewsets.ModelViewSet):
+# 	# define queryset
+#     global servi,ds_id
+#     queryset = repo_yearly.objects.filter(service=servi,device_id=ds_id)
+#     # graphdata = graph_info.objects.last()
+#     # print("graph data is:",graphdata.service_name,graphdata.device_id)
     
 
-	# specify serializer to be used
-    serializer_class = YearlySerializer
+# 	# specify serializer to be used
+#     serializer_class = YearlySerializer
         
 class DeviceViewset(viewsets.ModelViewSet):
 	# define queryset
@@ -113,6 +186,187 @@ class keyViewset(viewsets.ModelViewSet):
 
 	# specify serializer to be used
 	serializer_class = KeySerializer
+        
+class RwpstateViewset(viewsets.ModelViewSet):
+	# define queryset
+	queryset = Rwp_state.objects.all()
+
+	# specify serializer to be used
+	serializer_class = RwpstateSerializer
+class RwpsettingViewset(viewsets.ModelViewSet):
+	# define queryset
+	queryset = Rwp_setting.objects.all()
+
+	# specify serializer to be used
+	serializer_class = RwpsettingSerializer
+        
+class hppstateViewset(viewsets.ModelViewSet):
+	# define queryset
+	queryset = hpp_state.objects.all()
+
+	# specify serializer to be used
+	serializer_class = hppstateSerializer
+class hppsettingViewset(viewsets.ModelViewSet):
+	# define queryset
+	queryset = hpp_setting.objects.all()
+
+	# specify serializer to be used
+	serializer_class = hppsettingSerializer
+        
+class cndstateViewset(viewsets.ModelViewSet):
+	# define queryset
+	queryset = cnd_state.objects.all()
+
+	# specify serializer to be used
+	serializer_class = cndstateSerializer
+class cndsettingViewset(viewsets.ModelViewSet):
+	# define queryset
+	queryset = cnd_setting.objects.all()
+
+	# specify serializer to be used
+	serializer_class = cndsettingSerializer
+        
+class flowsenstateViewset(viewsets.ModelViewSet):
+	# define queryset
+	queryset = flowsen_state.objects.all()
+
+	# specify serializer to be used
+	serializer_class = flowsenstateSerializer
+class flowsensettingViewset(viewsets.ModelViewSet):
+	# define queryset
+	queryset = flowsen_setting.objects.all()
+
+	# specify serializer to be used
+	serializer_class = flowsensettingSerializer
+        
+class panelstateViewset(viewsets.ModelViewSet):
+	# define queryset
+	queryset = panel_state.objects.all()
+
+	# specify serializer to be used
+	serializer_class = panelstateSerializer
+class panelsettingViewset(viewsets.ModelViewSet):
+	# define queryset
+	queryset = panel_setting.objects.all()
+
+	# specify serializer to be used
+	serializer_class = panelsettingSerializer
+class atmstateViewset(viewsets.ModelViewSet):
+	# define queryset
+	queryset = atm_state.objects.all()
+
+	# specify serializer to be used
+	serializer_class = atmstateSerializer
+class atmsettingViewset(viewsets.ModelViewSet):
+	# define queryset
+	queryset = atm_setting.objects.all()
+
+	# specify serializer to be used
+	serializer_class = atmsettingSerializer
+        
+# class mappingViewset(viewsets.ModelViewSet):
+# 	# define queryset
+# 	queryset = mapping_comp.objects.all()
+
+# 	# specify serializer to be used
+# 	serializer_class = mappingSerializer
+# class consenstateViewset(viewsets.ModelViewSet):
+# 	# define queryset
+# 	queryset = consen_state.objects.all()
+
+# 	# specify serializer to be used
+# 	serializer_class = consenstateSerializer
+# class consensettingViewset(viewsets.ModelViewSet):
+# 	# define queryset
+# 	queryset = consen_setting.objects.all()
+
+# 	# specify serializer to be used
+# 	serializer_class = consensettingSerializer
+class ampv1stateViewset(viewsets.ModelViewSet):
+	# define queryset
+	queryset = ampv1_state.objects.all()
+
+	# specify serializer to be used
+	serializer_class = ampv1stateSerializer
+class ampv1settingViewset(viewsets.ModelViewSet):
+# 	# define queryset
+	queryset = ampv1_setting.objects.all()
+
+	# specify serializer to be used
+	serializer_class = ampv1settingSerializer
+class ampv2stateViewset(viewsets.ModelViewSet):
+	# define queryset
+	queryset = ampv2_state.objects.all()
+
+	# specify serializer to be used
+	serializer_class = ampv2stateSerializer
+class ampv2settingViewset(viewsets.ModelViewSet):
+	# define queryset
+	queryset = ampv2_setting.objects.all()
+
+	# specify serializer to be used
+	serializer_class = ampv2settingSerializer
+class ampv3stateViewset(viewsets.ModelViewSet):
+	# define queryset
+	queryset = ampv3_state.objects.all()
+
+	# specify serializer to be used
+	serializer_class = ampv3stateSerializer
+class ampv3settingViewset(viewsets.ModelViewSet):
+	# define queryset
+	queryset = ampv3_setting.objects.all()
+
+	# specify serializer to be used
+	serializer_class = ampv3settingSerializer
+class ampv4stateViewset(viewsets.ModelViewSet):
+	# define queryset
+	queryset = ampv4_state.objects.all()
+
+	# specify serializer to be used
+	serializer_class = ampv4stateSerializer
+class ampv4settingViewset(viewsets.ModelViewSet):
+	# define queryset
+	queryset = ampv4_setting.objects.all()
+
+	# specify serializer to be used
+	serializer_class = ampv4settingSerializer
+class ampv5stateViewset(viewsets.ModelViewSet):
+	# define queryset
+	queryset = ampv5_state.objects.all()
+
+	# specify serializer to be used
+	serializer_class = ampv5stateSerializer
+class ampv5settingViewset(viewsets.ModelViewSet):
+	# define queryset
+	queryset = ampv5_setting.objects.all()
+
+	# specify serializer to be used
+	serializer_class = ampv5settingSerializer
+class tap1settingViewset(viewsets.ModelViewSet):
+	# define queryset
+	queryset = tap1_setting.objects.all()
+
+	# specify serializer to be used
+	serializer_class = tap1settingSerializer
+class tap2settingViewset(viewsets.ModelViewSet):
+	# define queryset
+	queryset = tap2_setting.objects.all()
+
+	# specify serializer to be used
+	serializer_class = tap2settingSerializer
+class tap3settingViewset(viewsets.ModelViewSet):
+	# define queryset
+	queryset = tap3_setting.objects.all()
+
+	# specify serializer to be used
+	serializer_class = tap3settingSerializer
+class tap4settingViewset(viewsets.ModelViewSet):
+	# define queryset
+	queryset = tap4_setting.objects.all()
+
+	# specify serializer to be used
+	serializer_class = tap4settingSerializer
+        
         
 class HourlyViewset(viewsets.ModelViewSet):
 	# define queryset
@@ -228,11 +482,11 @@ def Treat_cnd(request):
 # spn=0
 # asp=0
 
-
 def testo(request):
     def on_connect(mqtt_client, userdata, flags, rc):
         if rc == 0:
             print('Connected successfully')
+            
             mqtt_client.subscribe('wc/#')
             # topicdata=topics.objects.all()
             # for top in topicdata:
