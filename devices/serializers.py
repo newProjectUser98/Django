@@ -195,3 +195,98 @@ class ampv2settingSerializer(serializers.HyperlinkedModelSerializer):
 		fields='__all__'
 
 		
+
+class RwpstateSerializer(serializers.HyperlinkedModelSerializer):
+	class Meta:
+		model = Rwp_state
+		fields='__all__'
+class RwpSettingSerializer(serializers.HyperlinkedModelSerializer):
+	class Meta:
+		model = rwp_setting
+		print("hi am from serilization")
+		fields=['olc','drc','spn','unit_type','company_name','componant_name']
+
+# class RwpSettingGetSerializer(serializers.HyperlinkedModelSerializer):
+# 	class Meta:
+# 		model = prwp_setting
+# 		# print("hi am from serilization")
+# 		fields=['componant_name','company_name','unit_type']
+
+# class RwpSettingGetSerializer(serializers.HyperlinkedModelSerializer):
+# 	class Meta:
+# 		model = rwp_setting
+# 		print("hi am from serilization")
+# 		fields='__all__'
+
+class hppstateSerializer(serializers.HyperlinkedModelSerializer):
+	class Meta:
+		model = hpp_state
+		fields='__all__'
+class hppsettingSerializer(serializers.HyperlinkedModelSerializer):
+	class Meta:
+		model = hpp_setting
+		fields='__all__'
+
+class cndsettingSerializer(serializers.HyperlinkedModelSerializer):
+	new_field = serializers.CharField()
+	class Meta:
+		model = cnd_setting
+		fields='__all__'
+
+class tdssettingSerializer(serializers.HyperlinkedModelSerializer):
+	class Meta:
+		model = tds_setting
+		fields='__all__'
+class FflowsensettingSerializer(serializers.HyperlinkedModelSerializer):
+	class Meta:
+		model = F_flowsen_setting
+		fields='__all__'
+
+class PflowsensettingSerializer(serializers.HyperlinkedModelSerializer):
+	class Meta:
+		model = P_flowsen_setting
+		fields='__all__'
+class panelsettingSerializer(serializers.HyperlinkedModelSerializer):
+	class Meta:
+		model = panel_setting
+		fields='__all__'
+class atmsettingSerializer(serializers.HyperlinkedModelSerializer):
+	class Meta:
+		model = atm_setting
+		fields='__all__'
+# class consensettingSerializer(serializers.HyperlinkedModelSerializer):
+# 	class Meta:
+# 		model = consen_setting
+# 		fields='__all__'
+class tap1settingSerializer(serializers.HyperlinkedModelSerializer):
+	class Meta:
+		model = tap1_setting
+		fields='__all__'
+class tap2settingSerializer(serializers.HyperlinkedModelSerializer):
+	class Meta:
+		model = tap2_setting
+		fields='__all__'
+class tap3settingSerializer(serializers.HyperlinkedModelSerializer):
+	class Meta:
+		model = tap3_setting
+		fields='__all__'
+class tap4settingSerializer(serializers.HyperlinkedModelSerializer):
+	class Meta:
+		model = tap4_setting
+		fields='__all__'
+class ampv1stateSerializer(serializers.HyperlinkedModelSerializer):
+	class Meta:
+		model = ampv1_state
+		fields='__all__'
+class ampv1settingSerializer(serializers.HyperlinkedModelSerializer):
+	class Meta:
+		model = ampv1_setting
+		fields='__all__'
+class ampv2stateSerializer(serializers.HyperlinkedModelSerializer):
+	class Meta:
+		model = ampv2_state
+		fields='__all__'
+class ampv2settingSerializer(serializers.HyperlinkedModelSerializer):
+	class Meta:
+		model = ampv2_setting
+		fields='__all__'
