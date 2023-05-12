@@ -474,25 +474,25 @@ class graph_info(models.Model):
     def str(self):
         return self.service_name
     
-class Rwp_setting(models.Model):
+class rwp_setting(models.Model):
     olc=models.CharField(max_length=100)
     drc=models.CharField(max_length=100)
     spn=models.CharField(max_length=100)
     unit_type=models.CharField(max_length=100)
     company_name=models.CharField(max_length=100)
-    componant_name=models.CharField(max_length=100)    
+    componant_name=models.CharField(max_length=100) 
+    device_id=models.CharField(max_length=100)   
     
 
     def str(self):
         return self.olc,self.drc,self.spn,self.unit_type,self.company_name,self.componant_name   
 class Rwp_state(models.Model):
-    sts=models.CharField(max_length=100)
-    crt=models.CharField(max_length=100)  
+    sts=models.CharField(max_length=100) 
     unit_type=models.CharField(max_length=100)
     company_name=models.CharField(max_length=100)
     componant_name=models.CharField(max_length=100)
     def str(self):
-        return self.sts,self.crt,    
+        return self.sts
     
 class hpp_setting(models.Model):
     olc=models.CharField(max_length=100)
@@ -507,7 +507,6 @@ class hpp_setting(models.Model):
         return self.olc
 class hpp_state(models.Model):
     sts=models.CharField(max_length=100)
-    crt=models.CharField(max_length=100) 
     unit_type=models.CharField(max_length=100)
     company_name=models.CharField(max_length=100)
     componant_name=models.CharField(max_length=100)
@@ -524,32 +523,36 @@ class cnd_setting(models.Model):
 
     def str(self):
         return self.spn 
-class cnd_state(models.Model):
-    cnd=models.CharField(max_length=100)
+class tds_setting(models.Model):
+    spn=models.CharField(max_length=100)
+    tsp=models.CharField(max_length=100)
+    asp=models.CharField(max_length=100)
+    unit_type=models.CharField(max_length=100)
+    company_name=models.CharField(max_length=100)
+    componant_name=models.CharField(max_length=100)  
+
+    def str(self):
+        return self.spn 
+    
+
+class F_flowsen_setting(models.Model):
+    ff=models.CharField(max_length=100)
     unit_type=models.CharField(max_length=100)
     company_name=models.CharField(max_length=100)
     componant_name=models.CharField(max_length=100)
 
     def str(self):
-        return self.cnd 
-class flowsen_setting(models.Model):
-    ff1=models.CharField(max_length=100)
-    ff2=models.CharField(max_length=100)
+        return self.ff
+    
+class P_flowsen_setting(models.Model):
+    ff=models.CharField(max_length=100)
     unit_type=models.CharField(max_length=100)
     company_name=models.CharField(max_length=100)
     componant_name=models.CharField(max_length=100)
 
     def str(self):
-        return self.ff1 
-class flowsen_state(models.Model):
-    fr1=models.CharField(max_length=100)
-    fr2=models.CharField(max_length=100)
-    unit_type=models.CharField(max_length=100)
-    company_name=models.CharField(max_length=100)
-    componant_name=models.CharField(max_length=100)
+        return self.ff
 
-    def str(self):
-        return self.fr1
 
 class panel_setting(models.Model):
     mod=models.CharField(max_length=100)
@@ -567,22 +570,6 @@ class panel_setting(models.Model):
     
     def str(self):
         return self.mod 
-class panel_state(models.Model):
-    sts=models.CharField(max_length=100)
-    rtl=models.CharField(max_length=100)
-    ttl=models.CharField(max_length=100)
-    lps=models.CharField(max_length=100)    
-    hps=models.CharField(max_length=100)    
-    dgp=models.CharField(max_length=100)    
-    ipv=models.CharField(max_length=100)    
-    bkt=models.CharField(max_length=100)    
-    rst=models.CharField(max_length=100)
-    componant_name=models.CharField(max_length=100)    
-    unit_type=models.CharField(max_length=100)    
-    company_name=models.CharField(max_length=100)    
-    
-    def str(self):
-        return self.sts 
 
 class atm_setting(models.Model):
     ntp=models.CharField(max_length=100)
@@ -602,19 +589,6 @@ class atm_setting(models.Model):
 
     def str(self):
         return self.ntp 
-class atm_state(models.Model):
-    sts=models.CharField(max_length=100)
-    ndv=models.CharField(max_length=100)
-    ntt=models.CharField(max_length=100)
-    nta=models.CharField(max_length=100)    
-    tmp=models.CharField(max_length=100)
-    unit_type=models.CharField(max_length=100)
-    company_name=models.CharField(max_length=100)
-    componant_name=models.CharField(max_length=100)    
-    
-
-    def str(self):
-        return self.sts 
     
 # class consen_setting(models.Model):
 #     spn=models.CharField(max_length=100)
@@ -625,14 +599,7 @@ class atm_state(models.Model):
 
 #     # def str(self):
 #     #     return self.spn
-# class consen_state(models.Model):
-#     cnd=models.CharField(max_length=100)
-#     unit_type=models.CharField(max_length=100)
-#     company_name=models.CharField(max_length=100)
-#     componant_name=models.CharField(max_length=100)
-    
-    # def str(self):
-    #     return self.cnd,self.unit_type,self.company_name,self.componant_name
+
 class tap1_setting(models.Model):
     p1=models.CharField(max_length=100)
     p2=models.CharField(max_length=100)
@@ -715,67 +682,9 @@ class ampv2_setting(models.Model):
 
     def str(self):
         return self.srt
-class ampv3_setting(models.Model):
-    srt=models.CharField(max_length=100)
-    bkt=models.CharField(max_length=100)
-    rst=models.CharField(max_length=100)
-    mot=models.CharField(max_length=100)
-    stp=models.CharField(max_length=100)
-    op1=models.CharField(max_length=100)
-    op2=models.CharField(max_length=100)
-    op3=models.CharField(max_length=100)
-    ip1=models.CharField(max_length=100)
-    ip2=models.CharField(max_length=100)
-    ip3=models.CharField(max_length=100)
-    psi=models.CharField(max_length=100)
-    unit_type=models.CharField(max_length=100)
-    company_name=models.CharField(max_length=100)
-    componant_name=models.CharField(max_length=100)
 
-    def str(self):
-        return self.srt
-class ampv4_setting(models.Model):
-    srt=models.CharField(max_length=100)
-    bkt=models.CharField(max_length=100)
-    rst=models.CharField(max_length=100)
-    mot=models.CharField(max_length=100)
-    stp=models.CharField(max_length=100)
-    op1=models.CharField(max_length=100)
-    op2=models.CharField(max_length=100)
-    op3=models.CharField(max_length=100)
-    ip1=models.CharField(max_length=100)
-    ip2=models.CharField(max_length=100)
-    ip3=models.CharField(max_length=100)
-    psi=models.CharField(max_length=100)
-    unit_type=models.CharField(max_length=100)
-    company_name=models.CharField(max_length=100)
-    componant_name=models.CharField(max_length=100)
-
-    def str(self):
-        return self.srt
-class ampv5_setting(models.Model):
-    srt=models.CharField(max_length=100)
-    bkt=models.CharField(max_length=100)
-    rst=models.CharField(max_length=100)
-    mot=models.CharField(max_length=100)
-    stp=models.CharField(max_length=100)
-    op1=models.CharField(max_length=100)
-    op2=models.CharField(max_length=100)
-    op3=models.CharField(max_length=100)
-    ip1=models.CharField(max_length=100)
-    ip2=models.CharField(max_length=100)
-    ip3=models.CharField(max_length=100)
-    psi=models.CharField(max_length=100)
-    unit_type=models.CharField(max_length=100)
-    company_name=models.CharField(max_length=100)
-    componant_name=models.CharField(max_length=100)
-
-    def str(self):
-        return self.srt
 class ampv1_state(models.Model):
     pos=models.CharField(max_length=100)
-    rmt=models.CharField(max_length=100)
-    cct=models.CharField(max_length=100)
     unit_type=models.CharField(max_length=100)
     company_name=models.CharField(max_length=100)
     componant_name=models.CharField(max_length=100)
@@ -784,48 +693,10 @@ class ampv1_state(models.Model):
         return self.pos
 class ampv2_state(models.Model):
     pos=models.CharField(max_length=100)
-    rmt=models.CharField(max_length=100)
-    cct=models.CharField(max_length=100)
     unit_type=models.CharField(max_length=100)
     company_name=models.CharField(max_length=100)
     componant_name=models.CharField(max_length=100)
     def str(self):
         return self.pos
-class ampv3_state(models.Model):
-    pos=models.CharField(max_length=100)
-    rmt=models.CharField(max_length=100)
-    cct=models.CharField(max_length=100)
-    unit_type=models.CharField(max_length=100)
-    company_name=models.CharField(max_length=100)
-    componant_name=models.CharField(max_length=100)
-    def str(self):
-        return self.pos
-class ampv4_state(models.Model):
-    pos=models.CharField(max_length=100)
-    rmt=models.CharField(max_length=100)
-    cct=models.CharField(max_length=100)
-    unit_type=models.CharField(max_length=100)
-    company_name=models.CharField(max_length=100)
-    componant_name=models.CharField(max_length=100)
-    def str(self):
-        return self.pos
-class ampv5_state(models.Model):
-    pos=models.CharField(max_length=100)
-    rmt=models.CharField(max_length=100)
-    cct=models.CharField(max_length=100)
-    unit_type=models.CharField(max_length=100)
-    company_name=models.CharField(max_length=100)
-    componant_name=models.CharField(max_length=100)
-    def str(self):
-        return self.pos
-    
-# class mapping_comp(models.Model):
-#     setting_variable=models.CharField(max_length=100)#nat,
-#     unit_type=models.CharField(max_length=100)#desp,Treat
-#     company_name=models.CharField(max_length=100)#
-#     componant_name=models.CharField(max_length=100)#atm,rwp
-#     device_id=models.CharField(max_length=100)
-    
-#     def str(self):
-#         return self.setting_variable,self.unit_type,self.company_name,self.componant_name
+
     
