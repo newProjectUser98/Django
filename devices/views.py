@@ -15,8 +15,9 @@ from asgiref.sync import async_to_sync
 from django.http import HttpResponse
 from channels.generic.websocket import WebsocketConsumer
 import json
+import time
 
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from datetime import datetime
 
 # get local timezone    
@@ -29,40 +30,55 @@ from .mqttconn import client as mqtt_client
 import json
 
 from django.http import JsonResponse
+import requests
+
+# response = requests.get('http://127.0.0.1:8000/topicapirwp_setting/')
+
+# if response.status_code == 200:
+#     print("HELLO",response.json())
 
 # from mqtt_test.mqtt import client as mqtt_client
 
 # from mqto.models import *
-mapobj=panel_setting.objects.all()
-cn1=str()
-cn=str()
-ut=str()
-print(mapobj,type(mapobj))
-for m in mapobj:
-    print(m.componant_name)
-    cn1=m.componant_name
-    cn=m.company_name
-    ut=m.unit_type
-    print(cn1)
-    print(cn)
-    print(ut)
-    print(panel_setting.componant_name)
+# mapobj=panel_setting.objects.all()
+# cn1=str()
+# cn=str()
+# ut=str()
+# print(mapobj,type(mapobj))
+# for m in mapobj:
+#     print(m.componant_name)
+#     cn1=m.componant_name
+#     cn=m.company_name
+#     ut=m.unit_type
+#     print(cn1)
+#     print(cn)
+#     print(ut)
+#     print(panel_setting.componant_name)
 
-mapobj = panel_setting.objects.all()
+# mapobj = panel_setting.objects.all()
 
-for m in mapobj:
-    setting_variable = m.spn  # or whichever setting variable you want to use
-    componant_name = m.componant_name
-    device = device_info.objects.filter(
-        setting_variable=setting_variable,
-        componant_name=componant_name
-    ).first()
-    if device:
-        device_id = device.Device_id
-        print("deviceId",device_id)
+# for m in mapobj:
+#     setting_variable = m.spn  # or whichever setting variable you want to use
+#     componant_name = m.componant_name
+#     device = device_info.objects.filter(
+#         setting_variable=setting_variable,
+#         componant_name=componant_name
+#     ).first()
+#     if device:
+#         device_id = device.Device_id
+#         print("deviceId",device_id)
     # di=device_info.objects.filter(device_name==)
-    comd={}
-    rwp=Rwp_setting.objects.last()
+comd={}
+# print("RC:",rc)
+    
+def publish_message():
+    # request_data = json.loads(request.body)
+    # testlist=['test/topic/1','test/topic/2']
+    # msg=input("Enter message:")
+
+    # for k,v in mapobj:
+    rwp=rwp_setting.objects.last()
+    print("RWP",rwp)
     comd.update({'olc':rwp.olc,'drc':rwp.drc,'spn':rwp.spn})
     print("comd",comd)
     print("rwp is:",rwp)
@@ -72,30 +88,28 @@ for m in mapobj:
     print("unit_type is:",rwp.unit_type)
     print("company_name is:",rwp.company_name)
     print("componant_name:",rwp.componant_name)
-dinfo=device_info.objects.filter(componant_name=rwp.componant_name,unit_type=rwp.unit_type,company_name=rwp.company_name)
-# print("dinfo is:",dinfo.componant_name)
-cmpname=str()
-did=0
-for x in dinfo:
-    print("did id:",x.Device_id)
-    did=x.Device_id
-    cmpname=x.componant_name
-def publish_message(request):
-    # request_data = json.loads(request.body)
-    # testlist=['test/topic/1','test/topic/2']
-    # msg=input("Enter message:")
+    print("-x-"*25)
+    dinfo=device_info.objects.filter(componant_name=rwp.componant_name,unit_type=rwp.unit_type,company_name=rwp.company_name)
+    # print("dinfo is:",dinfo.componant_name)
+    cmpname=str()
+    did=0
+    for x in dinfo:
+        print("did id:",x.Device_id)
+        did=x.Device_id
+        cmpname=x.componant_name
 
-    # for k,v in mapobj:
-
-    urlo=f"wc/{did}/updset/{cmpname}"
-    print("url is ",urlo)
-    testlist={f'wc/{did}/updset/{cmpname}':str(comd)}#,'test/topic/2':comd
-    print("****",testlist)
-    for k,v in testlist.items():
-        rc, mid = mqtt_client.publish(k,v)
+        urlo=f"wd/{did}/updset/{cmpname}"
+        print("url is ",urlo)
+        testlist={f'wd/{did}/updset/{cmpname}':str(comd)}#,'test/topic/2':comd
+        print("****",testlist)
+        for k,v in testlist.items():
+            rc, mid = mqtt_client.publish(k,v)
         # data=subscribers.objects.create(Topic=k,msg=v)
         # data.save()
-    return JsonResponse({'code': rc})
+    # return JsonResponse({'code': rc})
+
+# datax = publish_message()
+# print(datax)
 
 # from waterinn import mqttconn.mqttconn
 # from mqttconn.mqtt import client as mqtt_client
@@ -172,7 +186,13 @@ class TopicViewSet(viewsets.ModelViewSet):
 
 # 	# specify serializer to be used
 #     serializer_class = YearlySerializer
-        
+class YearlyViewset(viewsets.ModelViewSet):
+	# define queryset
+	queryset = repo_yearly.objects.all()
+
+	# specify serializer to be used
+	serializer_class = YearlySerializer
+
 class DeviceViewset(viewsets.ModelViewSet):
 	# define queryset
 	queryset = device_info.objects.all()
@@ -193,89 +213,313 @@ class RwpstateViewset(viewsets.ModelViewSet):
 
 	# specify serializer to be used
 	serializer_class = RwpstateSerializer
-class RwpsettingViewset(viewsets.ModelViewSet):
-	# define queryset
-	queryset = Rwp_setting.objects.all()
 
+# def dosome():
+#     response = requests.get('http://127.0.0.1:8000/topicapirwp_setting/')
+
+#     if response.status_code == 200:
+#         print("HELLO",response.json()[-1])
+# response = requests.get('http://127.0.0.1:8000/topicapirwp_setting/')
+rwp=rwp_setting.objects.last()
+
+dinfo=device_info.objects.filter(componant_name=rwp.componant_name,unit_type=rwp.unit_type,company_name=rwp.company_name)
+for x in dinfo:
+    print("did id:",x.Device_id)
+    did=x.Device_id
+    cmpname=x.componant_name
+    print("ddddid is",did)
+
+class rwpsettingViewset(viewsets.ModelViewSet):
+	# define queryset
+    print("hi ok ")
+    queryset = rwp_setting.objects.all()
+    print("queryset is",queryset)
+
+    data=queryset.last()
+    print("OLc",data.olc)
+    data = {'olc':data.olc,'drc':data.drc,'spn':data.spn,'units_type':data.unit_type,'company_name':data.company_name,'component_name':data.componant_name}
+    print('data is:',data)
+    # dosome()
+    print("Hi Satish")
+    
+    
 	# specify serializer to be used
-	serializer_class = RwpsettingSerializer
+    serializer_class = rwpsettingSerializer
+    
+    def dispatch(self, request, *args, **kwargs):
         
+        try:
+            data_dict = json.loads(request.body)
+            unwanted_keys = ["unit_type", "water_treatment","company_name","componant_name"]  # Example of unwanted keys
+            print("dict data is:",data_dict)
+            value_list=list(data_dict.values())
+            dinfo=device_info.objects.filter(componant_name=value_list[2],unit_type=value_list[1],company_name=value_list[0])
+            for x in dinfo:
+                print("did id:",x.Device_id)
+                did=x.Device_id
+                cmpname=x.componant_name
+                print("ddddid is",did)
+            for key in unwanted_keys:
+                if key in data_dict:
+                    del data_dict[key]
+            mqtt_client.publish(f'wd/{did}/updset/{cmpname}',str(data_dict))
+
+                
+            
+        except:
+            print("Error")
+        return super().dispatch(request)
+        
+    def desptroy(self, request):
+        try:
+            instance = self.get_object()
+            self.perform_destroy(instance)
+        except Http404:
+            pass
+
 class hppstateViewset(viewsets.ModelViewSet):
 	# define queryset
 	queryset = hpp_state.objects.all()
 
 	# specify serializer to be used
 	serializer_class = hppstateSerializer
-class hppsettingViewset(viewsets.ModelViewSet):
-	# define queryset
-	queryset = hpp_setting.objects.all()
-
-	# specify serializer to be used
-	serializer_class = hppsettingSerializer
         
-class cndstateViewset(viewsets.ModelViewSet):
-	# define queryset
-	queryset = cnd_state.objects.all()
+class hppsettingViewset(viewsets.ModelViewSet):
+        # define queryset
+        queryset = hpp_setting.objects.all()
+        # specify serializer to be used
+        serializer_class = hppsettingSerializer
+        def dispatch(self, request, *args, **kwargs):
+        
+            try:
+                data_dict = json.loads(request.body)
+                print("Request",request.body)
+                unwanted_keys = ["unit_type","company_name","componant_name"]  # Example of unwanted keys
+                print("dict data is:",data_dict)
+                value_list=list(data_dict.values())
+                comp=value_list[2]
+                print("comp is",comp)
+                print("value_list isaaaa:",value_list)
 
-	# specify serializer to be used
-	serializer_class = cndstateSerializer
+                dinfo=device_info.objects.filter(componant_name=value_list[2],unit_type=value_list[1],company_name=value_list[0])
+                print(dinfo)
+                for x in dinfo:
+                    print("did id:",x.Device_id)
+                    did=x.Device_id
+                    cmpname=x.componant_name
+                    print("ddddid is",did)
+                for key in unwanted_keys:
+                    if key in data_dict:
+                        del data_dict[key]
+                mqtt_client.publish(f'wd/{did}/updset/{cmpname}',str(data_dict))
+                print(did,cmpname,data_dict)
+            except:
+                print("Error")
+            return super().dispatch(request)
+            
+
+
 class cndsettingViewset(viewsets.ModelViewSet):
 	# define queryset
-	queryset = cnd_setting.objects.all()
-
-	# specify serializer to be used
-	serializer_class = cndsettingSerializer
+        queryset = cnd_setting.objects.all()
+        serializer_class = cndsettingSerializer
+        def dispatch(self, request, *args, **kwargs):
         
-class flowsenstateViewset(viewsets.ModelViewSet):
-	# define queryset
-	queryset = flowsen_state.objects.all()
+            try:
+                data_dict = json.loads(request.body)
+                print("Request",request.body)
+                unwanted_keys = ["unit_type","company_name","componant_name"]  # Example of unwanted keys
+                print("dict data is:",data_dict)
+                value_list=list(data_dict.values())
+                comp=value_list[2]
+                print("comp is",comp)
+                print("value_list isaaaa:",value_list)
 
-	# specify serializer to be used
-	serializer_class = flowsenstateSerializer
-class flowsensettingViewset(viewsets.ModelViewSet):
-	# define queryset
-	queryset = flowsen_setting.objects.all()
-
-	# specify serializer to be used
-	serializer_class = flowsensettingSerializer
+                dinfo=device_info.objects.filter(componant_name=value_list[2],unit_type=value_list[1],company_name=value_list[0])
+                print(dinfo)
+                for x in dinfo:
+                    print("did id:",x.Device_id)
+                    did=x.Device_id
+                    cmpname=x.componant_name
+                    print("ddddid is",did)
+                for key in unwanted_keys:
+                    if key in data_dict:
+                        del data_dict[key]
+                mqtt_client.publish(f'wd/{did}/updset/{cmpname}',str(data_dict))
+                print(did,cmpname,data_dict)
+            except:
+                print("Error")
+            return super().dispatch(request)
         
-class panelstateViewset(viewsets.ModelViewSet):
-	# define queryset
-	queryset = panel_state.objects.all()
+class tdssettingViewset(viewsets.ModelViewSet):
+        # define queryset
+        queryset = tds_setting.objects.all()
 
-	# specify serializer to be used
-	serializer_class = panelstateSerializer
+        # specify serializer to be used
+        serializer_class = tdssettingSerializer
+        
+        def dispatch(self, request, *args, **kwargs):
+        
+            try:
+                data_dict = json.loads(request.body)
+                print("Request",request.body)
+                unwanted_keys = ["unit_type","company_name","componant_name"]  # Example of unwanted keys
+                print("dict data is:",data_dict)
+                value_list=list(data_dict.values())
+                comp=value_list[2]
+                print("comp is",comp)
+                print("value_list isaaaa:",value_list)
+
+                dinfo=device_info.objects.filter(componant_name=value_list[2],unit_type=value_list[1],company_name=value_list[0])
+                print(dinfo)
+                for x in dinfo:
+                    print("did id:",x.Device_id)
+                    did=x.Device_id
+                    cmpname=x.componant_name
+                    print("ddddid is",did)
+                for key in unwanted_keys:
+                    if key in data_dict:
+                        del data_dict[key]
+                mqtt_client.publish(f'wd/{did}/updset/{cmpname}',str(data_dict))
+                print(did,cmpname,data_dict)
+            except:
+                print("Error")
+            return super().dispatch(request)
+    
+class FflowsensettingViewset(viewsets.ModelViewSet):
+        # define queryset
+        queryset = F_flowsen_setting.objects.all()
+
+        # specify serializer to be used
+        serializer_class = FflowsensettingSerializer
+        def dispatch(self, request, *args, **kwargs):
+        
+            try:
+                data_dict = json.loads(request.body)
+                print("Request",request.body)
+                unwanted_keys = ["unit_type","company_name","componant_name"]  # Example of unwanted keys
+                print("dict data is:",data_dict)
+                value_list=list(data_dict.values())
+                comp=value_list[2]
+                print("comp is",comp)
+                print("value_list isaaaa:",value_list)
+
+                dinfo=device_info.objects.filter(componant_name=value_list[2],unit_type=value_list[1],company_name=value_list[0])
+                print(dinfo)
+                for x in dinfo:
+                    print("did id:",x.Device_id)
+                    did=x.Device_id
+                    cmpname=x.componant_name
+                    print("ddddid is",did)
+                for key in unwanted_keys:
+                    if key in data_dict:
+                        del data_dict[key]
+                mqtt_client.publish(f'wd/{did}/updset/{cmpname}',str(data_dict))
+                print(did,cmpname,data_dict)
+            except:
+                print("Error")
+            return super().dispatch(request)
+        
+class PflowsensettingViewset(viewsets.ModelViewSet):
+	# define queryset
+        queryset = P_flowsen_setting.objects.all()
+
+        # specify serializer to be used
+        serializer_class =PflowsensettingSerializer
+        def dispatch(self, request, *args, **kwargs):
+        
+            try:
+                data_dict = json.loads(request.body)
+                print("Request",request.body)
+                unwanted_keys = ["unit_type","company_name","componant_name"]  # Example of unwanted keys
+                print("dict data is:",data_dict)
+                value_list=list(data_dict.values())
+                comp=value_list[2]
+                print("comp is",comp)
+                print("value_list isaaaa:",value_list)
+
+                dinfo=device_info.objects.filter(componant_name=value_list[2],unit_type=value_list[1],company_name=value_list[0])
+                print(dinfo)
+                for x in dinfo:
+                    print("did id:",x.Device_id)
+                    did=x.Device_id
+                    cmpname=x.componant_name
+                    print("ddddid is",did)
+                for key in unwanted_keys:
+                    if key in data_dict:
+                        del data_dict[key]
+                mqtt_client.publish(f'wd/{did}/updset/{cmpname}',str(data_dict))
+                print(did,cmpname,data_dict)
+            except:
+                print("Error")
+            return super().dispatch(request)
 class panelsettingViewset(viewsets.ModelViewSet):
 	# define queryset
-	queryset = panel_setting.objects.all()
+        queryset = panel_setting.objects.all()
 
-	# specify serializer to be used
-	serializer_class = panelsettingSerializer
-class atmstateViewset(viewsets.ModelViewSet):
-	# define queryset
-	queryset = atm_state.objects.all()
+        # specify serializer to be used
+        serializer_class = panelsettingSerializer
+        def dispatch(self, request, *args, **kwargs):
+        
+            try:
+                data_dict = json.loads(request.body)
+                print("Request",request.body)
+                unwanted_keys = ["unit_type","company_name","componant_name"]  # Example of unwanted keys
+                print("dict data is:",data_dict)
+                value_list=list(data_dict.values())
+                comp=value_list[2]
+                print("comp is",comp)
+                print("value_list isaaaa:",value_list)
 
-	# specify serializer to be used
-	serializer_class = atmstateSerializer
+                dinfo=device_info.objects.filter(componant_name=value_list[2],unit_type=value_list[1],company_name=value_list[0])
+                print(dinfo)
+                for x in dinfo:
+                    print("did id:",x.Device_id)
+                    did=x.Device_id
+                    cmpname=x.componant_name
+                    print("ddddid is",did)
+                for key in unwanted_keys:
+                    if key in data_dict:
+                        del data_dict[key]
+                mqtt_client.publish(f'wd/{did}/updset/{cmpname}',str(data_dict))
+                print(did,cmpname,data_dict)
+            except:
+                print("Error")
+            return super().dispatch(request)
 class atmsettingViewset(viewsets.ModelViewSet):
 	# define queryset
-	queryset = atm_setting.objects.all()
+        queryset = atm_setting.objects.all()
 
-	# specify serializer to be used
-	serializer_class = atmsettingSerializer
+        # specify serializer to be used
+        serializer_class = atmsettingSerializer
+        def dispatch(self, request, *args, **kwargs):
         
-# class mappingViewset(viewsets.ModelViewSet):
-# 	# define queryset
-# 	queryset = mapping_comp.objects.all()
+            try:
+                data_dict = json.loads(request.body)
+                print("Request",request.body)
+                unwanted_keys = ["unit_type","company_name","componant_name"]  # Example of unwanted keys
+                print("dict data is:",data_dict)
+                value_list=list(data_dict.values())
+                comp=value_list[2]
+                print("comp is",comp)
+                print("value_list isaaaa:",value_list)
 
-# 	# specify serializer to be used
-# 	serializer_class = mappingSerializer
-# class consenstateViewset(viewsets.ModelViewSet):
-# 	# define queryset
-# 	queryset = consen_state.objects.all()
-
-# 	# specify serializer to be used
-# 	serializer_class = consenstateSerializer
+                dinfo=device_info.objects.filter(componant_name=value_list[2],unit_type=value_list[1],company_name=value_list[0])
+                print(dinfo)
+                for x in dinfo:
+                    print("did id:",x.Device_id)
+                    did=x.Device_id
+                    cmpname=x.componant_name
+                    print("ddddid is",did)
+                for key in unwanted_keys:
+                    if key in data_dict:
+                        del data_dict[key]
+                mqtt_client.publish(f'wd/{did}/updset/{cmpname}',str(data_dict))
+                print(did,cmpname,data_dict)
+            except:
+                print("Error")
+            return super().dispatch(request)
+        
 # class consensettingViewset(viewsets.ModelViewSet):
 # 	# define queryset
 # 	queryset = consen_setting.objects.all()
@@ -290,10 +534,37 @@ class ampv1stateViewset(viewsets.ModelViewSet):
 	serializer_class = ampv1stateSerializer
 class ampv1settingViewset(viewsets.ModelViewSet):
 # 	# define queryset
-	queryset = ampv1_setting.objects.all()
+        queryset = ampv1_setting.objects.all()
 
-	# specify serializer to be used
-	serializer_class = ampv1settingSerializer
+        # specify serializer to be used
+        serializer_class = ampv1settingSerializer
+        def dispatch(self, request, *args, **kwargs):
+        
+            try:
+                data_dict = json.loads(request.body)
+                print("Request",request.body)
+                unwanted_keys = ["unit_type","company_name","componant_name"]  # Example of unwanted keys
+                print("dict data is:",data_dict)
+                value_list=list(data_dict.values())
+                comp=value_list[2]
+                print("comp is",comp)
+                print("value_list isaaaa:",value_list)
+
+                dinfo=device_info.objects.filter(componant_name=value_list[2],unit_type=value_list[1],company_name=value_list[0])
+                print(dinfo)
+                for x in dinfo:
+                    print("did id:",x.Device_id)
+                    did=x.Device_id
+                    cmpname=x.componant_name
+                    print("ddddid is",did)
+                for key in unwanted_keys:
+                    if key in data_dict:
+                        del data_dict[key]
+                mqtt_client.publish(f'wd/{did}/updset/{cmpname}',str(data_dict))
+                print(did,cmpname,data_dict)
+            except:
+                print("Error")
+            return super().dispatch(request)
 class ampv2stateViewset(viewsets.ModelViewSet):
 	# define queryset
 	queryset = ampv2_state.objects.all()
@@ -302,70 +573,170 @@ class ampv2stateViewset(viewsets.ModelViewSet):
 	serializer_class = ampv2stateSerializer
 class ampv2settingViewset(viewsets.ModelViewSet):
 	# define queryset
-	queryset = ampv2_setting.objects.all()
+        queryset = ampv2_setting.objects.all()
 
-	# specify serializer to be used
-	serializer_class = ampv2settingSerializer
-class ampv3stateViewset(viewsets.ModelViewSet):
-	# define queryset
-	queryset = ampv3_state.objects.all()
+        # specify serializer to be used
+        serializer_class = ampv2settingSerializer
+        def dispatch(self, request, *args, **kwargs):
+        
+            try:
+                data_dict = json.loads(request.body)
+                print("Request",request.body)
+                unwanted_keys = ["unit_type","company_name","componant_name"]  # Example of unwanted keys
+                print("dict data is:",data_dict)
+                value_list=list(data_dict.values())
+                comp=value_list[2]
+                print("comp is",comp)
+                print("value_list isaaaa:",value_list)
 
-	# specify serializer to be used
-	serializer_class = ampv3stateSerializer
-class ampv3settingViewset(viewsets.ModelViewSet):
-	# define queryset
-	queryset = ampv3_setting.objects.all()
+                dinfo=device_info.objects.filter(componant_name=value_list[2],unit_type=value_list[1],company_name=value_list[0])
+                print(dinfo)
+                for x in dinfo:
+                    print("did id:",x.Device_id)
+                    did=x.Device_id
+                    cmpname=x.componant_name
+                    print("ddddid is",did)
+                for key in unwanted_keys:
+                    if key in data_dict:
+                        del data_dict[key]
+                mqtt_client.publish(f'wd/{did}/updset/{cmpname}',str(data_dict))
+                print(did,cmpname,data_dict)
+            except:
+                print("Error")
+            return super().dispatch(request)
 
-	# specify serializer to be used
-	serializer_class = ampv3settingSerializer
-class ampv4stateViewset(viewsets.ModelViewSet):
-	# define queryset
-	queryset = ampv4_state.objects.all()
-
-	# specify serializer to be used
-	serializer_class = ampv4stateSerializer
-class ampv4settingViewset(viewsets.ModelViewSet):
-	# define queryset
-	queryset = ampv4_setting.objects.all()
-
-	# specify serializer to be used
-	serializer_class = ampv4settingSerializer
-class ampv5stateViewset(viewsets.ModelViewSet):
-	# define queryset
-	queryset = ampv5_state.objects.all()
-
-	# specify serializer to be used
-	serializer_class = ampv5stateSerializer
-class ampv5settingViewset(viewsets.ModelViewSet):
-	# define queryset
-	queryset = ampv5_setting.objects.all()
-
-	# specify serializer to be used
-	serializer_class = ampv5settingSerializer
 class tap1settingViewset(viewsets.ModelViewSet):
 	# define queryset
-	queryset = tap1_setting.objects.all()
+        queryset = tap1_setting.objects.all()
 
-	# specify serializer to be used
-	serializer_class = tap1settingSerializer
+        # specify serializer to be used
+        serializer_class = tap1settingSerializer
+        def dispatch(self, request, *args, **kwargs):
+        
+            try:
+                data_dict = json.loads(request.body)
+                print("Request",request.body)
+                unwanted_keys = ["unit_type","company_name","componant_name"]  # Example of unwanted keys
+                print("dict data is:",data_dict)
+                value_list=list(data_dict.values())
+                comp=value_list[2]
+                print("comp is",comp)
+                print("value_list isaaaa:",value_list)
+
+                dinfo=device_info.objects.filter(componant_name=value_list[2],unit_type=value_list[1],company_name=value_list[0])
+                print(dinfo)
+                for x in dinfo:
+                    print("did id:",x.Device_id)
+                    did=x.Device_id
+                    cmpname=x.componant_name
+                    print("ddddid is",did)
+                for key in unwanted_keys:
+                    if key in data_dict:
+                        del data_dict[key]
+                mqtt_client.publish(f'wd/{did}/updset/{cmpname}',str(data_dict))
+                print(did,cmpname,data_dict)
+            except:
+                print("Error")
+            return super().dispatch(request)
 class tap2settingViewset(viewsets.ModelViewSet):
 	# define queryset
-	queryset = tap2_setting.objects.all()
+        queryset = tap2_setting.objects.all()
 
-	# specify serializer to be used
-	serializer_class = tap2settingSerializer
+        # specify serializer to be used
+        serializer_class = tap2settingSerializer
+        def dispatch(self, request, *args, **kwargs):
+        
+            try:
+                data_dict = json.loads(request.body)
+                print("Request",request.body)
+                unwanted_keys = ["unit_type","company_name","componant_name"]  # Example of unwanted keys
+                print("dict data is:",data_dict)
+                value_list=list(data_dict.values())
+                comp=value_list[2]
+                print("comp is",comp)
+                print("value_list isaaaa:",value_list)
+
+                dinfo=device_info.objects.filter(componant_name=value_list[2],unit_type=value_list[1],company_name=value_list[0])
+                print(dinfo)
+                for x in dinfo:
+                    print("did id:",x.Device_id)
+                    did=x.Device_id
+                    cmpname=x.componant_name
+                    print("ddddid is",did)
+                for key in unwanted_keys:
+                    if key in data_dict:
+                        del data_dict[key]
+                mqtt_client.publish(f'wd/{did}/updset/{cmpname}',str(data_dict))
+                print(did,cmpname,data_dict)
+            except:
+                print("Error")
+            return super().dispatch(request)
 class tap3settingViewset(viewsets.ModelViewSet):
 	# define queryset
-	queryset = tap3_setting.objects.all()
+        queryset = tap3_setting.objects.all()
 
-	# specify serializer to be used
-	serializer_class = tap3settingSerializer
+        # specify serializer to be used
+        serializer_class = tap3settingSerializer
+        def dispatch(self, request, *args, **kwargs):
+        
+            try:
+                data_dict = json.loads(request.body)
+                print("Request",request.body)
+                unwanted_keys = ["unit_type","company_name","componant_name"]  # Example of unwanted keys
+                print("dict data is:",data_dict)
+                value_list=list(data_dict.values())
+                comp=value_list[2]
+                print("comp is",comp)
+                print("value_list isaaaa:",value_list)
+
+                dinfo=device_info.objects.filter(componant_name=value_list[2],unit_type=value_list[1],company_name=value_list[0])
+                print(dinfo)
+                for x in dinfo:
+                    print("did id:",x.Device_id)
+                    did=x.Device_id
+                    cmpname=x.componant_name
+                    print("ddddid is",did)
+                for key in unwanted_keys:
+                    if key in data_dict:
+                        del data_dict[key]
+                mqtt_client.publish(f'wd/{did}/updset/{cmpname}',str(data_dict))
+                print(did,cmpname,data_dict)
+            except:
+                print("Error")
+            return super().dispatch(request)
 class tap4settingViewset(viewsets.ModelViewSet):
 	# define queryset
-	queryset = tap4_setting.objects.all()
+        queryset = tap4_setting.objects.all()
 
-	# specify serializer to be used
-	serializer_class = tap4settingSerializer
+        # specify serializer to be used
+        serializer_class = tap4settingSerializer
+        def dispatch(self, request, *args, **kwargs):
+        
+            try:
+                data_dict = json.loads(request.body)
+                print("Request",request.body)
+                unwanted_keys = ["unit_type","company_name","componant_name"]  # Example of unwanted keys
+                print("dict data is:",data_dict)
+                value_list=list(data_dict.values())
+                comp=value_list[2]
+                print("comp is",comp)
+                print("value_list isaaaa:",value_list)
+
+                dinfo=device_info.objects.filter(componant_name=value_list[2],unit_type=value_list[1],company_name=value_list[0])
+                print(dinfo)
+                for x in dinfo:
+                    print("did id:",x.Device_id)
+                    did=x.Device_id
+                    cmpname=x.componant_name
+                    print("ddddid is",did)
+                for key in unwanted_keys:
+                    if key in data_dict:
+                        del data_dict[key]
+                mqtt_client.publish(f'wd/{did}/updset/{cmpname}',str(data_dict))
+                print(did,cmpname,data_dict)
+            except:
+                print("Error")
+            return super().dispatch(request)
         
         
 class HourlyViewset(viewsets.ModelViewSet):
@@ -408,16 +779,17 @@ def Treat_cnd(request):
 
 
 # def publish_message(request):
-#     # request_data = json.loads(request.body)
-#     # testlist=['test/topic/1','test/topic/2']
-#     # msg=input("Enter message:")
-#     testlist={'test/topic/1':input("Enter message:"),'test/topic/2':input("Enter message:")}
+# def publish_message():
+    # request_data = json.loads(request.body)
+    # testlist=['test/topic/1','test/topic/2']
+    # msg=input("Enter message:")
+    # testlist={'test/topic/1':input("Enter message:"),'test/topic/2':input("Enter message:")}
 
-#     for k,v in testlist.items():
-#         rc, mid = mqtt_client.publish(k,v)
-#         # data=subscribers.objects.create(Topic=k,msg=v)
-#         # data.save()
-#     return JsonResponse({'code': rc})
+    # for k,v in testlist.items():
+    #     rc, mid = mqtt_client.publish(k,v)
+    #     # data=subscribers.objects.create(Topic=k,msg=v)
+    #     # data.save()
+    # return JsonResponse({'code': rc})
 
 # cnd=0
 # spn=0
@@ -483,11 +855,23 @@ def Treat_cnd(request):
 # asp=0
 
 def testo(request):
+    
     def on_connect(mqtt_client, userdata, flags, rc):
+        # global rc
         if rc == 0:
             print('Connected successfully')
+
             
             mqtt_client.subscribe('wc/#')
+            
+        # response = requests.get('http://127.0.0.1:8000/topicapirwp_setting/')
+
+        # if response.status_code == 200:
+        #     print("HELLO",response.json()[-1])
+
+            # print(response.J``)
+            
+            
             # topicdata=topics.objects.all()
             # for top in topicdata:
             #     print("topic is:",top)
@@ -496,10 +880,11 @@ def testo(request):
             # for k, v in topicdata.items():
             #     if k=='Topic_name':
             # mqtt_client.subscribe('django/mqtt')
+        
         else:
             print('Bad connection. Code:', rc)
 
-
+    
     def on_message(mqtt_client, userdata, msg):
         # global cnd,spn,tsp,asp,sts,crt,olc,drc,rtl,ttl,lps,hps,dgp,mod,ipv,unv,ovv,nmv,stp,srt,bkt,rst,err,fr1,fr2,ff1,ff2,pos,rmt,cct,srt,bkt,mot,stp,op1,op2,op3,ip1,ip2,ip3,psi,ndv,ntt,nta,tmp,ntp,nov,vl1,vl2,vl3,vl4,re1,re2,re3,re4,p1,p2,p3,p4,cnd,spn,asp
         global msgo
@@ -580,9 +965,6 @@ def testo(request):
             removed_col = loop_data.split(':')
             print("removed_col",removed_col)
             mydata[removed_col[0]] =removed_col[1]
-
-
-           
 
             
             if removed_col[0]=='cnd':
@@ -804,7 +1186,43 @@ def testo(request):
         hourset=set()
         dd=dateandtime() 
         print("$$$$$$$ddn is:",dd,type(dd)) 
-        print(dd[0]) 
+        print(dd[0])
+        response = requests.get('http://127.0.0.1:8000/topicapirwp_setting/')
+
+        try:
+            if response.status_code == 200:
+                print("HELLO in if:",response.json()[-1])
+                datas=response.json()[-1]
+
+                rwp=rwp_setting.objects.last()
+                print("RWP",rwp)
+                comd.update({'olc':rwp.olc,'drc':rwp.drc,'spn':rwp.spn})
+                print("comd",comd)
+                print("rwp is:",rwp)
+                print("olc is:",rwp.olc)
+                print("drc is:",rwp.drc)
+                print("spn is:",rwp.spn)
+                print("unit_type is:",rwp.unit_type)
+                print("company_name is:",rwp.company_name)
+                print("componant_name:",rwp.componant_name)
+                print("-x-"*25)
+                dinfo=devices_info.objects.filter(componant_name=rwp.componant_name,unit_type=rwp.unit_type,company_name=rwp.company_name)
+                # print("dinfo is:",dinfo.componant_name)
+                cmpname=str()
+                did=0
+                for x in dinfo:
+                    print("did id:",x.Device_id)
+                    did=x.Device_id
+                    cmpname=x.componant_name
+
+                    urlo=f"wd/{did}/updset/{cmpname}"
+                    print("url is ",urlo)
+                    testlist={f'wd/{did}/updset/{cmpname}':str(datas)}#,'test/topic/2':comd
+                    print("****",testlist)
+                    for k,v in testlist.items():
+                        rc, mid = mqtt_client.publish(k,v)
+        except:
+            pass 
         try:
             if 'cnd_tds'== components:
                 # com=cl
@@ -942,6 +1360,8 @@ def testo(request):
             return e                 
         try:
             if 'rwp'==components:
+                
+                
                 if device_id not in device_idlist:
                     repo_latestdata.objects.create(device_id=device_id,message_type=msg_type,rwp=mydata1)
                 else:
@@ -1063,7 +1483,8 @@ def testo(request):
                 else:
                     yr_data=repo_hourly.objects.create(device_id=device_id,service='rwp_crt',sum=sums,count=count,avg=avgs,hour=dd[3],month=dd[1],year=dd[0],day=dd[2])
                     yr_data.save()
-                
+                # publish_message()
+            
         
         except Exception as e:
             print("error ==>", e)
@@ -3095,7 +3516,38 @@ def testo(request):
         except Exception as e:
             print("error ==>", e)
             return e 
+        
+        # response = requests.get('http://127.0.0.1:8000/topicapirwp_setting/')
 
+        # if response.status_code == 200:
+        #     print("HELLO",response.json())
+    # rwp=rwp_setting.objects.last()
+    # print("RWP",rwp)
+    # comd.update({'olc':rwp.olc,'drc':rwp.drc,'spn':rwp.spn})
+    # print("comd",comd)
+    # print("rwp is:",rwp)
+    # print("olc is:",rwp.olc)
+    # print("drc is:",rwp.drc)
+    # print("spn is:",rwp.spn)
+    # print("unit_type is:",rwp.unit_type)
+    # print("company_name is:",rwp.company_name)
+    # print("componant_name:",rwp.componant_name)
+    # print("-x-"*25)
+    # dinfo=devices_info.objects.filter(componant_name=rwp.componant_name,unit_type=rwp.unit_type,company_name=rwp.company_name)
+    # # print("dinfo is:",dinfo.componant_name)
+    # cmpname=str()
+    # did=0
+    # for x in dinfo:
+    #     print("did id:",x.Device_id)
+    #     did=x.Device_id
+    #     cmpname=x.componant_name
+
+    #     urlo=f"wd/{did}/updset/{cmpname}"
+    #     print("url is ",urlo)
+    #     testlist={f'wd/{did}/updset/{cmpname}':str(comd)}#,'test/topic/2':comd
+    #     print("****",testlist)
+    #     for k,v in testlist.items():
+    #         rc, mid = mqtt_client.publish(k,v)
     mqtt_client.on_connect = on_connect
     mqtt_client.on_message = on_message
     # client.username_pw_set(settings.MQTT_USER, settings.MQTT_PASSWORD)
@@ -3107,5 +3559,6 @@ def testo(request):
     # mqtt_client.connect('broker.example.com', 1883)
 
     # Start the client loop
+    
     mqtt_client.loop_forever()
 
