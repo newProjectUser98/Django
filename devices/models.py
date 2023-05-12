@@ -700,3 +700,229 @@ class ampv2_state(models.Model):
         return self.pos
 
     
+class rwp_setting(models.Model):
+    olc=models.CharField(max_length=100)
+    drc=models.CharField(max_length=100)
+    spn=models.CharField(max_length=100)
+    unit_type=models.CharField(max_length=100)
+    company_name=models.CharField(max_length=100)
+    componant_name=models.CharField(max_length=100) 
+    device_id=models.CharField(max_length=100)   
+    
+
+    def str(self):
+        return self.olc,self.drc,self.spn,self.unit_type,self.company_name,self.componant_name   
+class Rwp_state(models.Model):
+    sts=models.CharField(max_length=100) 
+    unit_type=models.CharField(max_length=100)
+    company_name=models.CharField(max_length=100)
+    componant_name=models.CharField(max_length=100)
+    def str(self):
+        return self.sts
+    
+class hpp_setting(models.Model):
+    olc=models.CharField(max_length=100)
+    drc=models.CharField(max_length=100)
+    spn=models.CharField(max_length=100)
+    unit_type=models.CharField(max_length=100)
+    company_name=models.CharField(max_length=100)
+    componant_name=models.CharField(max_length=100)    
+    
+
+    def str(self):
+        return self.olc
+class hpp_state(models.Model):
+    sts=models.CharField(max_length=100)
+    unit_type=models.CharField(max_length=100)
+    company_name=models.CharField(max_length=100)
+    componant_name=models.CharField(max_length=100)
+
+    def str(self):
+        return self.sts
+class cnd_setting(models.Model):
+    spn=models.CharField(max_length=100)
+    tsp=models.CharField(max_length=100)
+    asp=models.CharField(max_length=100)
+    unit_type=models.CharField(max_length=100)
+    company_name=models.CharField(max_length=100)
+    componant_name=models.CharField(max_length=100)  
+
+    def str(self):
+        return self.spn 
+class tds_setting(models.Model):
+    spn=models.CharField(max_length=100)
+    tsp=models.CharField(max_length=100)
+    asp=models.CharField(max_length=100)
+    unit_type=models.CharField(max_length=100)
+    company_name=models.CharField(max_length=100)
+    componant_name=models.CharField(max_length=100)  
+
+    def str(self):
+        return self.spn 
+    
+
+class F_flowsen_setting(models.Model):
+    ff=models.CharField(max_length=100)
+    unit_type=models.CharField(max_length=100)
+    company_name=models.CharField(max_length=100)
+    componant_name=models.CharField(max_length=100)
+
+    def str(self):
+        return self.ff
+    
+class P_flowsen_setting(models.Model):
+    ff=models.CharField(max_length=100)
+    unit_type=models.CharField(max_length=100)
+    company_name=models.CharField(max_length=100)
+    componant_name=models.CharField(max_length=100)
+
+    def str(self):
+        return self.ff
+
+
+class panel_setting(models.Model):
+    mod=models.CharField(max_length=100)
+    unv=models.CharField(max_length=100)
+    ovv=models.CharField(max_length=100)
+    spn=models.CharField(max_length=100)    
+    nmv=models.CharField(max_length=100)    
+    stp=models.CharField(max_length=100)    
+    srt=models.CharField(max_length=100)    
+    bkt=models.CharField(max_length=100)    
+    rst=models.CharField(max_length=100)    
+    componant_name=models.CharField(max_length=100)    
+    unit_type=models.CharField(max_length=100)    
+    company_name=models.CharField(max_length=100)    
+    
+    def str(self):
+        return self.mod 
+
+class atm_setting(models.Model):
+    ntp=models.CharField(max_length=100)
+    nov=models.CharField(max_length=100)
+    vl1=models.CharField(max_length=100)
+    vl2=models.CharField(max_length=100)    
+    vl3=models.CharField(max_length=100)    
+    vl4=models.CharField(max_length=100)    
+    re1=models.CharField(max_length=100)    
+    re2=models.CharField(max_length=100)    
+    re3=models.CharField(max_length=100)    
+    re4=models.CharField(max_length=100)
+    unit_type=models.CharField(max_length=100)
+    company_name=models.CharField(max_length=100)
+    componant_name=models.CharField(max_length=100)    
+    
+
+    def str(self):
+        return self.ntp 
+    
+class consen_setting(models.Model):
+    spn=models.CharField(max_length=100)
+    asp=models.CharField(max_length=100)
+    unit_type=models.CharField(max_length=100)
+    company_name=models.CharField(max_length=100)
+    componant_name=models.CharField(max_length=100)
+
+    # def str(self):
+    #     return self.spn
+
+class tap1_setting(models.Model):
+    p1=models.CharField(max_length=100)
+    p2=models.CharField(max_length=100)
+    p3=models.CharField(max_length=100)
+    p4=models.CharField(max_length=100)
+    unit_type=models.CharField(max_length=100)
+    company_name=models.CharField(max_length=100)
+    componant_name=models.CharField(max_length=100)
+
+    def str(self):
+        return self.p1
+class tap2_setting(models.Model):
+    p1=models.CharField(max_length=100)
+    p2=models.CharField(max_length=100)
+    p3=models.CharField(max_length=100)
+    p4=models.CharField(max_length=100)
+    unit_type=models.CharField(max_length=100)
+    company_name=models.CharField(max_length=100)
+    componant_name=models.CharField(max_length=100)
+
+    def str(self):
+        return self.p1
+class tap3_setting(models.Model):
+    p1=models.CharField(max_length=100)
+    p2=models.CharField(max_length=100)
+    p3=models.CharField(max_length=100)
+    p4=models.CharField(max_length=100)
+    unit_type=models.CharField(max_length=100)
+    company_name=models.CharField(max_length=100)
+    componant_name=models.CharField(max_length=100)
+
+    def str(self):
+        return self.p1
+class tap4_setting(models.Model):
+    p1=models.CharField(max_length=100)
+    p2=models.CharField(max_length=100)
+    p3=models.CharField(max_length=100)
+    p4=models.CharField(max_length=100)
+    unit_type=models.CharField(max_length=100)
+    company_name=models.CharField(max_length=100)
+    componant_name=models.CharField(max_length=100)
+
+    def str(self):
+        return self.p1
+class ampv1_setting(models.Model):
+    srt1=models.CharField(max_length=100)
+    srt2=models.CharField(max_length=100)
+    bkt=models.CharField(max_length=100)
+    rst=models.CharField(max_length=100)
+    mot=models.CharField(max_length=100)
+    stp=models.CharField(max_length=100)
+    op1=models.CharField(max_length=100)
+    op2=models.CharField(max_length=100)
+    op3=models.CharField(max_length=100)
+    ip1=models.CharField(max_length=100)
+    ip2=models.CharField(max_length=100)
+    ip3=models.CharField(max_length=100)
+    psi=models.CharField(max_length=100)
+    unit_type=models.CharField(max_length=100)
+    company_name=models.CharField(max_length=100)
+    componant_name=models.CharField(max_length=100)
+
+    def str(self):
+        return self.srt
+class ampv2_setting(models.Model):
+    srt1=models.CharField(max_length=100)
+    srt2=models.CharField(max_length=100)
+    bkt=models.CharField(max_length=100)
+    rst=models.CharField(max_length=100)
+    mot=models.CharField(max_length=100)
+    stp=models.CharField(max_length=100)
+    op1=models.CharField(max_length=100)
+    op2=models.CharField(max_length=100)
+    op3=models.CharField(max_length=100)
+    ip1=models.CharField(max_length=100)
+    ip2=models.CharField(max_length=100)
+    ip3=models.CharField(max_length=100)
+    psi=models.CharField(max_length=100)
+    unit_type=models.CharField(max_length=100)
+    company_name=models.CharField(max_length=100)
+    componant_name=models.CharField(max_length=100)
+
+    def str(self):
+        return self.srt
+
+class ampv1_state(models.Model):
+    pos=models.CharField(max_length=100)
+    unit_type=models.CharField(max_length=100)
+    company_name=models.CharField(max_length=100)
+    componant_name=models.CharField(max_length=100)
+    
+    def str(self):
+        return self.pos
+class ampv2_state(models.Model):
+    pos=models.CharField(max_length=100)
+    unit_type=models.CharField(max_length=100)
+    company_name=models.CharField(max_length=100)
+    componant_name=models.CharField(max_length=100)
+    def str(self):
+        return self.pos

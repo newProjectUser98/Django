@@ -162,6 +162,126 @@ def dateandtime():
     return year,month,day,hour,minit,second
 
 
+class RwpSettingView(viewsets.ModelViewSet):
+	# define queryset
+    queryset = rwp_setting.objects.all().order_by('-id')[:1]
+
+	# specify serializer to be used
+    serializer_class = RwpSettingSerializer
+        
+class hppstateViewset(viewsets.ModelViewSet):
+	# define queryset
+	queryset = hpp_state.objects.all().order_by('-id')[:1]
+
+	# specify serializer to be used
+	serializer_class = hppstateSerializer
+class hppsettingViewset(viewsets.ModelViewSet):
+	# define queryset
+	queryset = hpp_setting.objects.all().order_by('-id')[:1]
+
+	# specify serializer to be used
+	serializer_class = hppsettingSerializer
+        
+class cndsettingViewset(viewsets.ModelViewSet):
+	# define queryset
+	queryset = cnd_setting.objects.all().order_by('-id')[:1]
+data = {
+    'device_id': '123'  # add a new field dynamically
+}
+
+# serializer = TopicSerializer(data=data)
+	# specify serializer to be used
+    
+serializer_class = cndsettingSerializer(data=data)
+        
+class tdssettingViewset(viewsets.ModelViewSet):
+	# define queryset
+	queryset = tds_setting.objects.all().order_by('-id')[:1]
+
+	# specify serializer to be used
+	serializer_class = tdssettingSerializer
+    
+class FflowsensettingViewset(viewsets.ModelViewSet):
+	# define queryset
+	queryset = F_flowsen_setting.objects.all().order_by('-id')[:1]
+
+	# specify serializer to be used
+	serializer_class = FflowsensettingSerializer
+class PflowsensettingViewset(viewsets.ModelViewSet):
+	# define queryset
+	queryset = P_flowsen_setting.objects.all().order_by('-id')[:1]
+
+	# specify serializer to be used
+	serializer_class =PflowsensettingSerializer
+class panelsettingViewset(viewsets.ModelViewSet):
+	# define queryset
+	queryset = panel_setting.objects.all().order_by('-id')[:1]
+
+	# specify serializer to be used
+	serializer_class = panelsettingSerializer
+class atmsettingViewset(viewsets.ModelViewSet):
+	# define queryset
+	queryset = atm_setting.objects.all().order_by('-id')[:1]
+
+	# specify serializer to be used
+	serializer_class = atmsettingSerializer
+        
+# class consensettingViewset(viewsets.ModelViewSet):
+# 	# define queryset
+# 	queryset = consen_setting.objects.all()
+
+# 	# specify serializer to be used
+# 	serializer_class = consensettingSerializer
+class ampv1stateViewset(viewsets.ModelViewSet):
+	# define queryset
+	queryset = ampv1_state.objects.all().order_by('-id')[:1]
+
+	# specify serializer to be used
+	serializer_class = ampv1stateSerializer
+class ampv1settingViewset(viewsets.ModelViewSet):
+# 	# define queryset
+	queryset = ampv1_setting.objects.all().order_by('-id')[:1]
+
+	# specify serializer to be used
+	serializer_class = ampv1settingSerializer
+class ampv2stateViewset(viewsets.ModelViewSet):
+	# define queryset
+	queryset = ampv2_state.objects.all().order_by('-id')[:1]
+
+	# specify serializer to be used
+	serializer_class = ampv2stateSerializer
+class ampv2settingViewset(viewsets.ModelViewSet):
+	# define queryset
+	queryset = ampv2_setting.objects.all().order_by('-id')[:1]
+
+	# specify serializer to be used
+	serializer_class = ampv2settingSerializer
+
+class tap1settingViewset(viewsets.ModelViewSet):
+	# define queryset
+	queryset = tap1_setting.objects.all().order_by('-id')[:1]
+
+	# specify serializer to be used
+	serializer_class = tap1settingSerializer
+class tap2settingViewset(viewsets.ModelViewSet):
+	# define queryset
+	queryset = tap2_setting.objects.all().order_by('-id')[:1]
+
+	# specify serializer to be used
+	serializer_class = tap2settingSerializer
+class tap3settingViewset(viewsets.ModelViewSet):
+	# define queryset
+	queryset = tap3_setting.objects.all()
+
+	# specify serializer to be used
+	serializer_class = tap3settingSerializer
+class tap4settingViewset(viewsets.ModelViewSet):
+	# define queryset
+	queryset = tap4_setting.objects.all().order_by('-id')[:1]
+
+	# specify serializer to be used
+	serializer_class = tap4settingSerializer
+        
 # # import mongoengine
 # # mongoengine.connect(db=waterinn, host=localhost:27017, username=username, password=pwd)
 class TopicViewSet(viewsets.ModelViewSet):
