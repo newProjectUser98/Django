@@ -10,6 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
+# import django
+# django.setup()
 from pathlib import Path
 import os
 
@@ -26,23 +28,29 @@ SECRET_KEY = 'django-insecure-gc(%!fv@7v(-fu(irmmkaw)$q425g^)w*_t5$4f$d#vxza93^a
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'channels',
+    # 'devices.apps.DevicesConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'devices',
+    'django.contrib.sites',
+    'channels',
     'rest_framework',
     'corsheaders',
+    'devices',
+    # 'daphne',
+    
+    
 ]
+SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -57,11 +65,11 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware'
     
 ]
-CORS_ORIGIN_ALLOW_ALL = True
-CORS_ORIGIN_WHITELIST = [
-    'http://localhost:3000',
-    # Add other allowed origins here
-]
+# CORS_ORIGIN_ALLOW_ALL = True
+# CORS_ORIGIN_WHITELIST = [
+#     'http://localhost:3000',
+#     # Add other allowed origins here
+# ]
 
 # CORS_ALLOWED_ORIGINS = [
 #     "https://example.com",
@@ -78,7 +86,7 @@ CORS_ORIGIN_WHITELIST = [
 # # CORS_ORIGIN_ALLOW_ALL = True
 # CORS_ALLOW_CREDENTIALS = False
 
-ROOT_URLCONF = 'waterinn.urls'
+# ROOT_URLCONF = 'waterinn.urls'
 
 TEMPLATES = [
     {
@@ -96,9 +104,19 @@ TEMPLATES = [
     },
 ]
 
-# WSGI_APPLICATION = 'waterinn.wsgi.application'
 
-ASGI_APPLICATION = 'waterinn.routing.application'
+# Additional Nginx configuration for static files and other settings...
+
+WSGI_APPLICATION = 'waterinn.wsgi.application'
+
+# ASGI_APPLICATION = 'waterinn.routing.application'
+ASGI_APPLICATION = 'waterinn.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
 # CHANNEL_LAYERS = {
 #     'default': {
 #         'BACKEND': 'channels.layers.InMemoryChannelLayer',
@@ -119,6 +137,23 @@ ASGI_APPLICATION = 'waterinn.routing.application'
 #     # }
 # }
 # }
+
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_WHITELIST = [
+    "http://127.0.0.1:8000",
+    "http://65.2.189.24:8000"
+]
+
+
+CORS_ALLOWED_ORIGINS = [
+    "http://127.0.0.1:8000",
+    "http://65.2.189.24:8000"
+]
+ALLOWED_HOSTS=['*']
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = False
+ROOT_URLCONF = 'waterinn.urls'
 DATABASES = {
        'default': {
            'ENGINE': 'djongo',
@@ -171,7 +206,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
-
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
