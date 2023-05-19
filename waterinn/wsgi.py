@@ -11,6 +11,17 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
+os.environ.setdefault('DJANGO_SETTINGS_MODULE','waterinn.settings')
+
+application = get_wsgi_application()
+
+# daphne waterinn.asgi:application
+# daphne waterinn.asgi:application
+# export DJANGO_SETTINGS_MODULE=waterinn.settings
+
+import os
+from django.core.wsgi import get_wsgi_application
+
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'waterinn.settings')
 
 application = get_wsgi_application()
