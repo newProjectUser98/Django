@@ -3,7 +3,8 @@ from rest_framework import serializers
 
 # import model from models.py
 from .models import *
-
+authors = serializers.SerializerMethodField("get_author_serializer")
+publisher = serializers.SerializerMethodField("get_publisher_serializer")
 # # Create a model serializer
 # class GeeksSerializer(serializers.HyperlinkedModelSerializer):
 # 	# specify model and fields
@@ -27,6 +28,8 @@ from .models import *
 # 	class Meta:
 # 		model = NewDecice_details
 # 		fields = ('__all__')
+
+
 
 class TopicSerializer(serializers.HyperlinkedModelSerializer):
 	class Meta:

@@ -18,6 +18,7 @@ from django.urls import path,include
 from .views import *
 from rest_framework import routers
 router = routers.DefaultRouter()
+
 router.register(r'Topic',TopicViewSet)
 # router.register(r'repo_yearly',YearlyViewset)
 router.register(r'device_info',DeviceViewset)

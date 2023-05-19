@@ -1893,20 +1893,22 @@ class consen_repo_yearly(models.Model):
 
 class device_info(models.Model):
     Device_id=models.CharField(max_length=100)
-    Device_name=models.CharField(max_length=100)    
-    unit_type=models.CharField(max_length=100)
-    company_name=models.CharField(max_length=100)
-    componant_name=models.CharField(max_length=100)
-
+    Device_name=models.CharField(max_length=100)
+    setting_variable=models.CharField(max_length=100)#nat,
+    unit_type=models.CharField(max_length=100)#desp,Treat
+    company_name=models.CharField(max_length=100)#
+    componant_name=models.CharField(max_length=100)#atm,rwp   
+    
 
     def str(self):
-        return self.Device_id
+        return self.Device_id,self.Device_name,self.setting_variable,self.unit_type,self.company_name,self.componant_name
     
     class Meta:
         app_label = 'devices'
 class key_info(models.Model):
     key_name=models.CharField(max_length=100)
-    key_value=models.CharField(max_length=100)    
+    key_value=models.CharField(max_length=100)
+        
     
 
 
